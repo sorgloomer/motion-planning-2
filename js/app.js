@@ -1,4 +1,4 @@
-(function(Box2D, utils, WORLD, Configuration) {
+(function(utils, WORLD, Configuration) {
   "use strict";
 
   var totalTime = 0;
@@ -13,12 +13,6 @@
   }
 
 
-
-  function simulate(dt) {
-    model.world.Step(dt, 2, 2);
-  }
-
-
   function restart() {
     totalTime = 0;
     model.reset();
@@ -26,56 +20,19 @@
 
 
   function cycle() {
-    simulate(0.06);
     config[2] += 0.01;
+    config[1] -= 0.03;
     Configuration.load(config, model);
-    view.setHighlighted('agent', agentHasCollision(model));
+    view.setHighlighted(model.isValid());
     view.update();
-  }
-
-  function notNull(ptr) {
-    return !Box2D.compare(ptr, Box2D.NULL);
   }
 
   function startUp() {
     setupModel();
-
     Configuration.save(config, model);
-
-
+    config[1] = 20;
     scheduleCycle();
-
-    setTimeout(function() {
-      console.log(agentHasCollision(model));
-    }, 100);
   }
-
-
-  function agentHasCollision(model) {
-    var contactPtr = model.names.get("agent").GetContactList(), cnt = 0;
-    // console.log(contactPtr.get_contact());
-    while (notNull(contactPtr)) {
-      var contact = contactPtr.get_contact();
-      var manifold = contact.GetManifold();
-      cnt += manifold.get_pointCount();
-      // var localPoint = manifold.get_localPoint();
-      // var worldPoint = contact.GetFixtureA().GetBody().GetWorldPoint(localPoint);
-      // addHighlightedPoint(worldPoint.get_x(), worldPoint.get_y());
-      contactPtr = contactPtr.get_next();
-    }
-    // console.log(cnt);
-    return cnt > 0;
-  }
-
-  function addHighlightedPoint(x, y) {
-    var circ = document.createElement('div');
-    circ.className = 'circle';
-    View.positionElement(circ, x, y);
-    viewport.appendChild(circ);
-  }
-
-
-
 
 
   function cycleIteration() {
@@ -89,4 +46,4 @@
   startUp();
 
   self.restart = restart;
-})(Box2D, utils, WORLD, Configuration);
+})(utils, WORLD, Configuration);

@@ -18,14 +18,16 @@
       height: 100%;
       width: 100%;
     }
-    .bodyview {
+
+    .agent, .walls {
       position: absolute;
       display: block;
       width: 0;
       height: 0;
       border: none;
     }
-    .box {
+
+    .box, .rect {
       position: absolute;
       display: block;
       width: 0;
@@ -33,7 +35,11 @@
       border: 10px solid #070;
       background-color: #4a4;
     }
-    .box-static {
+    .rect {
+      border-color: red;
+      background-color: transparent;
+    }
+    .walls .box {
       border-color: #555;
       background-color: #aaa;
     }

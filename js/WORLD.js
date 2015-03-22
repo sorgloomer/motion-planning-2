@@ -28,36 +28,8 @@ var WORLD = (function(utils) {
 
 
   return {
-    //gravity: [0, -10],
-    bodies: [
-      {
-        name: 'ground',
-        type: 'static',
-        pos: [0, 0],
-        angle: 0,
-        shape: SHAPE_GROUND
-      },
-      {
-        name: 'agent',
-        type: 'dynamic',
-        pos: [0, 0],
-        angle: 1,
-        shape: SHAPE_U
-      }
-      /*
-      ,{
-        type: 'dynamic',
-        pos: [0, 10],
-        angle: 3,
-        shape: SHAPE_U
-      }*/
-    ].concat(utils.range(0, function (i) {
-        return {
-          type: 'dynamic',
-          pos: [Math.random() * 10, 10 + i * 1.5],
-          angle: Math.random() * 3.14,
-          shape: SHAPE_DOUBLE
-        }
-      }))
+    walls: SHAPE_GROUND,
+    agent: SHAPE_U,
+    start: { pos: [0, 0], angle: 0 }
   };
 })(utils);

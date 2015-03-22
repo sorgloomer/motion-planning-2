@@ -15,13 +15,13 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
     return res;
   }
 
-  function maxBy(list, by) {
+  function stratBy(list, by, strat) {
     if (list && list.length > 0) {
       var val = by(list[0]), item = list[0];
       for (var i = 1; i < list.length; i++) {
         var currItem = list[i];
         var currVal = by(currItem);
-        if (currVal > val) {
+        if (strat(currVal, val)) {
           val = currVal;
           item = currItem;
         }
@@ -30,28 +30,42 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
     }
   }
 
+  function greater(a, b) {
+    return a > b;
+  }
+  function smaller(a, b) {
+    return a < b;
+  }
+  function maxBy(list, by) {
+    return stratBy(list, by, greater);
+  }
+  function minBy(list, by) {
+    return stratBy(list, by, smaller);
+  }
+
   function nonEmpty(arr) {
     return arr && arr.length > 0;
   }
   function measure(separated) {
-    if (nonEmpty(separated[0]) && nonEmpty(separated[1])) {
-      var node1 = BoxTree.wrap(separated[0]);
-      var node2 = BoxTree.wrap(separated[1]);
+    if (separated && nonEmpty(separated[0]) && nonEmpty(separated[1])) {
+      var dir = separated[2];
+      var node1 = BoxTree.wrap(separated[0], dir);
+      var node2 = BoxTree.wrap(separated[1], dir);
       var score = -OBox.penetration(node1.box, node2.box);
       return {
         score: score,
         node1: node1,
-        node2: node2
+        node2: node2,
+        dir: dir
       };
     }
   }
 
-  function fromList(list, mapper) {
-    if (mapper === undefined) mapper = invoke_aabb;
+  function fromList(list) {
 
     var allLeaves = list.map(function(item) {
       var res = new BoxTree();
-      mapper(res, item);
+      OBox.set(res.box, item);
       res.process();
       return res;
     });
@@ -63,15 +77,17 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
         return list[0];
       } else {
 
-        var best = maxBy(DIRARR.map(function(dir) { return splitByDir(list, dir); }).filter(boolify).map(measure), scoreOf);
+        var best = maxBy(DIRARR.map(function(dir) { return splitByDir(list, dir); }).map(measure).filter(boolify), scoreOf);
 
         if (best) {
           return BoxTree.wrap([
             recurse(best.node1.children),
             recurse(best.node2.children)
-          ]);
+          ], best.dir);
         } else {
-          return BoxTree.wrap(list);
+          return minBy(DIRARR.map(function(dir) {
+            return BoxTree.wrap(list, dir);
+          }), areaOf);
         }
       }
     }
@@ -79,8 +95,8 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
     return recurse(allLeaves);
 
     function scoreOf(x) { return x.score; }
+    function areaOf(x) { return x.area; }
     function boolify(x) { return !!x; }
-    function invoke_aabb(node, item) { item.aabb(node); }
   }
 
   function dotSimilarTranslation(simi, dir) {
@@ -99,16 +115,18 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
     return x.node;
   }
   function splitByDir(nodes, dir) {
-    nodes = nodes.map(function(node) {
-      return {
-        value: dotSimilarTranslation(node.box.placement, dir),
-        node: node
-      };
-    });
-    nodes.sort(byValue);
-    nodes = nodes.map(nodeOf);
-    var mid = nodes.length >> 2;
-    return [ nodes.slice(0, mid), nodes.slice(mid) ];
+    if (nodes && nodes.length > 1) {
+      nodes = nodes.map(function (node) {
+        return {
+          value: dotSimilarTranslation(node.box.placement, dir),
+          node: node
+        };
+      });
+      nodes.sort(byValue);
+      nodes = nodes.map(nodeOf);
+      var mid = nodes.length >> 2;
+      return [nodes.slice(0, mid), nodes.slice(mid), dir];
+    }
   }
 
 

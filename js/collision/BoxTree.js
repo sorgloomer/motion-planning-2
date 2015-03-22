@@ -1,5 +1,7 @@
 var BoxTree = (function(Math, OBox, vec2, similar2) {
 
+  var TEMP_OBOX = new OBox();
+
   function BoxTree() {
     this.box = new OBox();
     this.area = 0;
@@ -16,44 +18,8 @@ var BoxTree = (function(Math, OBox, vec2, similar2) {
   };
 
 
-
-  function listVertices(output, node) {
-    vec2.setXY(output[0], node.xmin, node.ymin);
-    vec2.setXY(output[1], node.xmin, node.ymax);
-    vec2.setXY(output[2], node.xmax, node.ymin);
-    vec2.setXY(output[3], node.xmax, node.ymax);
-    return output;
-  }
-
-  var TEMP_OBOX = new OBox();
-  var TEMP_TEMP = vec2.array(6);
-  var TEMP_VERTICES = TEMP_TEMP.subarray(0, 4);
-  var TEMP_VEC = TEMP_TEMP[4];
-  var TEMP_VEC2 = TEMP_TEMP[5];
-  var max = Math.max;
-  var min = Math.min;
-
-
-
-  function testOverlapBy(points1, points2, dx, dy) {
-    var min1, max1, min2, max2, curr, i;
-    min1 = max1 = dotvxy(points1[0], dx, dy);
-    for (i = 1; i < points1.length; i++) {
-      curr = dotvxy(points1[i], dx, dy);
-      min1 = min(min1, curr);
-      max1 = max(max1, curr);
-    }
-    min2 = max2 = dotvxy(points2[0], dx, dy);
-    for (i = 1; i < points2.length; i++) {
-      curr = dotvxy(points2[i], dx, dy);
-      min2 = min(min2, curr);
-      max2 = max(max2, curr);
-    }
-    return max1 >= min2 && min1 <= max2;
-  }
-
   function collidesShallow(node1, node2, node2sim) {
-    OBox.transform(TEMP_OBOX, node2.box, node2sim);
+    OBox.transform_(TEMP_OBOX, node2.box, node2sim);
     return OBox.collide(node1.box, TEMP_OBOX);
   }
 

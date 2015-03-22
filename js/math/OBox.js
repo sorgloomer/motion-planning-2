@@ -1,8 +1,8 @@
 var OBox = (function(Float32Array, vec2, similar2) {
 
   var TEMP_TEMP = vec2.array(10);
-  var TEMP_VERTICES1 = TEMP_TEMP.subarray(0, 4);
-  var TEMP_VERTICES2 = TEMP_TEMP.subarray(4, 8);
+  var TEMP_VERTICES1 = TEMP_TEMP.slice(0, 4);
+  var TEMP_VERTICES2 = TEMP_TEMP.slice(4, 8);
   var TEMP_VEC1 = TEMP_TEMP[8];
   var TEMP_VEC2 = TEMP_TEMP[9];
   var max = Math.max;
@@ -38,7 +38,7 @@ var OBox = (function(Float32Array, vec2, similar2) {
   }
 
   function transform_(output, what, sim) {
-    similar2.transform_(output.placement, what.placement, sim);
+    similar2.mul_(output.placement, what.placement, sim);
     vec2.set(output.hsize, what.hsize);
     return output;
   }
@@ -124,6 +124,14 @@ var OBox = (function(Float32Array, vec2, similar2) {
     return penetration(a, b) >= 0;
   }
 
+  function create(hw, hh, x, y, a) {
+    var res = new OBox();
+    vec2.setXY(res.hsize, hw, hh);
+    similar2.setXYA(res.placement, x, y, a);
+    return res;
+  }
+
+  OBox.create = create;
   OBox.penetration = penetration;
   OBox.collide = collide;
   OBox.transform_ = transform_;
