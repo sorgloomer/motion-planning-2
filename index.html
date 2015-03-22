@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title></title>
+  <style>
+    #main-area {
+      border: 1px solid black;
+      width: 800px;
+      height: 600px;
+      overflow: hidden;
+    }
+
+    #viewport {
+      display: block;
+      transform: scale(0.1, -0.1) translate(50%, 50%);
+      overflow: visible;
+      height: 100%;
+      width: 100%;
+    }
+    .bodyview {
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border: none;
+    }
+    .box {
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border: 10px solid #070;
+      background-color: #4a4;
+    }
+    .box-static {
+      border-color: #555;
+      background-color: #aaa;
+    }
+    .circle {
+      border: 10px solid #600;
+      background: #d00;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+    .highlight .box {
+      border-color: #773;
+      background: #ee5;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="main-area" onclick="restart();">
+    <div id="viewport">
+    </div>
+  </div>
+
+
+  <script src="lib/box2d.min.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/Model.js"></script>
+  <script src="js/View.js"></script>
+  <script src="js/Configuration.js"></script>
+  <script src="js/WORLD.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
