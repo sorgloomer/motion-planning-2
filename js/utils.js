@@ -14,7 +14,6 @@ var utils = (function() {
     return (x !== undefined) ? x : y;
   }
 
-
   return {
     times: times,
     range: range,

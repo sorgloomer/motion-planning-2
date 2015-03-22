@@ -31,6 +31,13 @@ var vec2 = (function(Float32Array, Array, Math){
     return output;
   }
 
+  function cmul_(output, a, b) {
+    var ax = a[0], ay = a[1], bx = b[0], by = b[1];
+    output[0] = ax * bx - ay * by;
+    output[1] = ax * by + ay * bx;
+    return output;
+  }
+
   function set(output, v){
     output.set(v, 0);
     return output;
@@ -69,6 +76,9 @@ var vec2 = (function(Float32Array, Array, Math){
   function scale(v, s) {
     return scale_(v, v, s);
   }
+  function cmul(a, b) {
+    return cmul_(a, a, b);
+  }
 
   function createXY(x, y) {
     return setXY(create(), x, y);
@@ -101,10 +111,12 @@ var vec2 = (function(Float32Array, Array, Math){
     sub_: sub_,
     scale_: scale_,
     right_: right_,
+    cmul_: cmul_,
     add: add,
     sub: sub,
     scale: scale,
     right: right,
+    cmul: cmul,
     dot: dot,
     cross: cross,
     len2: len2,
