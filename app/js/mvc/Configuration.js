@@ -37,8 +37,15 @@ var Configuration = (function(Math, Float32Array, similar2) {
     output[1] = y;
     output[2] = fmod(a, TWO_PI);
   }
+  function start(out, def) {
+    out[0] = def.start.pos[0];
+    out[1] = def.start.pos[1];
+    out[2] = def.start.angle;
+    return out;
+  }
   return {
     create: create,
+    start: start,
     load: load,
     dist: dist,
     lerp: lerp,

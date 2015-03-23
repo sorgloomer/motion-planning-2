@@ -20,20 +20,21 @@ var WORLD = (function(utils) {
       { size: [40, 5], pos: [    0, -30], angle:   0 },
       { size: [40, 5], pos: [    0,  30], angle:   0 },
 
-      { size: [2, 18], pos: [ -15,  -10], angle:   0 },
-      { size: [2, 18], pos: [  15,  -10], angle:   0 },
 
-      { size: [2, 6], pos: [ -17,  20], angle:   0 },
-      { size: [2, 6], pos: [  17,  20], angle:   0 }
+      { size: [2, 18], pos: [ -15,  -10.7], angle:   0 },
+      { size: [2, 18], pos: [  15,  -10.7], angle:   0 },
+
+      { size: [2, 5], pos: [ -15,  20.5], angle:   0 },
+      { size: [2, 5], pos: [  15,  20.5], angle:   0 }
     ]
-      .concat(slice(1, 1, 25, 25, 0, -5, 50, 130, 20))
-      .concat(slice(1, 1, 20, 20, 0, -5, 40, 140, 20))
+      .concat(slice(2, 2, 26, 26, 0, -5, 62, 118, 9))
+      .concat(slice(2, 2, 19, 19, 0, -5, 40, 140, 11))
     ;
 
 
   return {
     walls: SHAPE_WALLS,
     agent: SHAPE_U,
-    start: { pos: [0, 0], angle: 0 }
+    start: { pos: [-26, -20], angle: 0 }
   };
 })(utils);
