@@ -6,6 +6,7 @@ var BoxTree = (function(Math, OBox, vec2, similar2) {
     this.box = new OBox();
     this.area = 0;
     this.children = null;
+    this.leafCount = 0;
   }
 
   BoxTree.prototype.isLeaf = function _BoxTree_isLeaf() {
@@ -14,6 +15,16 @@ var BoxTree = (function(Math, OBox, vec2, similar2) {
   BoxTree.prototype.process = function _BoxTree_process() {
     var box = this.box;
     var hsize = box.hsize;
+    var leafCount = 0;
+
+    if (this.children) {
+      this.children.forEach(function(c) {
+        leafCount += c.leafCount;
+      });
+    } else {
+      leafCount = 1;
+    }
+    this.leafCount = leafCount;
     this.area = 4 * hsize[0] * hsize[1] * similar2.det(box.placement);
   };
 
@@ -63,9 +74,9 @@ var BoxTree = (function(Math, OBox, vec2, similar2) {
   function copyArr(a) {
     return a && a.slice(0);
   }
-  function wrap(list, orientation) {
+  function wrap(list, orientation, children) {
     var result = new BoxTree();
-    result.children = copyArr(list);
+    result.children = copyArr(children || list);
     OBox.wrapAll(result.box, list.map(boxOf), orientation);
     result.process();
     return result;

@@ -80,10 +80,10 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
         var best = maxBy(DIRARR.map(function(dir) { return splitByDir(list, dir); }).map(measure).filter(boolify), scoreOf);
 
         if (best) {
-          return BoxTree.wrap([
+          return BoxTree.wrap(list, best.dir, [
             recurse(best.node1.children),
             recurse(best.node2.children)
-          ], best.dir);
+          ]);
         } else {
           return minBy(DIRARR.map(function(dir) {
             return BoxTree.wrap(list, dir);
@@ -124,7 +124,7 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
       });
       nodes.sort(byValue);
       nodes = nodes.map(nodeOf);
-      var mid = nodes.length >> 2;
+      var mid = nodes.length >> 1;
       return [nodes.slice(0, mid), nodes.slice(mid), dir];
     }
   }
