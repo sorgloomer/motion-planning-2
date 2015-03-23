@@ -29,7 +29,6 @@
 
   function startUp() {
     setupModel();
-    Configuration.save(config, model);
     config[1] = 20;
     scheduleCycle();
   }

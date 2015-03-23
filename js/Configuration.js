@@ -1,21 +1,31 @@
-var Configuration = (function(Float32Array, similar2) {
+var Configuration = (function(Math, Float32Array, similar2) {
 
-  function Configuration_create() {
+  var TWO_PI = Math.PI * 2, PI = Math.PI;
+  function create() {
     return new Float32Array(3);
   }
 
-  function Configuration_save(config, model) {
-  }
-
-  function Configuration_load(config, model) {
+  function load(config, model) {
     similar2.setXYA(model.agentPlacement, config[0], config[1], config[2]);
     return config;
   }
 
+  function fmod(a, b) {
+    return a - Math.floor(a / b) * b;
+  }
+  function sqr(x) {
+    return x * x;
+  }
+  function dist(a, b) {
+    var da = fmod(Math.abs(a - b), TWO_PI);
+    da = PI - Math.abs(da - PI);
+    return Math.sqrt(sqr(a[0] - b[0]) + sqr(a[1] - b[1]) + da * da);
+  }
+
   return {
-    create: Configuration_create,
-    save: Configuration_save,
-    load: Configuration_load
+    create: create,
+    load: load,
+    dist: dist
   };
-})(Float32Array, similar2);
+})(Math, Float32Array, similar2);
 

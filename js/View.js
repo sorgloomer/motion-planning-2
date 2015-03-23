@@ -12,7 +12,7 @@ var View = (function(Map, utils) {
     this.walls = createView(definition.walls, viewport, "walls");
     this.agent = createView(definition.agent, viewport, "agent");
 
-    this.walls.appendChild(createTree(this.model.wallsTree, "rect"));
+    // this.walls.appendChild(createTree(this.model.wallsTree, "rect"));
 
     this.update();
   }

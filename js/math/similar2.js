@@ -1,6 +1,13 @@
 var similar2 = (function(Float32Array, Array, Math) {
   "use strict";
 
+  /*
+    c     s     0
+   -s     c     0
+    x     y     1
+  ================
+  [c s x y]
+   */
   function create() {
     return new Float32Array(4);
   }
