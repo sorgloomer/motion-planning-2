@@ -1,4 +1,4 @@
-var OBox = (function(Float32Array, vec2, similar2) {
+var OBox = (function() {
 
   var TEMP_TEMP = vec2.array(10);
   var TEMP_VERTICES1 = TEMP_TEMP.slice(0, 4);
@@ -142,4 +142,4 @@ var OBox = (function(Float32Array, vec2, similar2) {
 
   return OBox;
 
-})(Float32Array, vec2, similar2);
+})();

@@ -12,7 +12,7 @@ define('planning.RrtInc', [
   var itemCmp = utils.byCmp("score");
 
   function RrtInc(map) {
-    var self = this;
+    var _this = this;
     var samples = this.samples = [];
     var edges = this.edges = [];
     this.map = map;
@@ -20,19 +20,23 @@ define('planning.RrtInc', [
     var quad = new NBoxTree(map.nbox);
     var trialCount = 0;
     var target = map.target;
+    var Configuration = map.configuration;
+    var ConfigurationInput = Configuration.input;
 
     var resolution = map.resolution;
-    var resolution2 = resolution * resolution * 0.95;
+    var resolution2 = resolution * resolution * 0.90;
 
     var localSampler = map.sampler;
 
     var solutionSample = null;
-    var TEMP = map.start.slice(0);
+    var TEMP_INPUT = ConfigurationInput.create();
+    var TEMP = Configuration.create();
 
     putNewItemByPos(map.start, null);
 
 
     function putNewItemByPos(dot, parent) {
+      dot = Configuration.copy(dot);
       var item = { pos: dot, fails: 0, parent: parent };
       if (putDotInTree(dot)) {
         samples.push(item);
@@ -64,53 +68,38 @@ define('planning.RrtInc', [
     }
 
 
-    function len2(a) {
-      var s = 0;
-      for (var i = 0; i < a.length; i++) s += a[i] * a[i];
-      return s;
-    }
-    function len(a) {
-      return Math.sqrt(len2(a));
-    }
-    function scale(v, s) {
-      for (var i = 0; i < v.length; i++) v[i] *= s;
-    }
-    function fmod(a, b) {
-      return a - Math.floor(a / b) * b;
-    }
-    function verifyDot(item, temp, edot) {
-      scale(temp, resolution/len(temp));
-      self.samplesGenerated++;
-
+    function verifyDot(item, edot) {
       var p = item.pos;
-      for (var i = 0; i < edot.length; i++) {
-        edot[i] = p[i] + temp[i];
-      }
-      edot[2] = fmod(edot[2], Math.PI * 2);
-
       return !hasNear(edot)
-        && !helper.checkLine(localSampler, p, edot, resolution * 1.01, resolution);
+        && !helper.checkLine(localSampler, p, edot, resolution * 1.01, resolution, Configuration.lerp);
     }
 
-    function putRandomDot() {
-      for (var i = 0; i < TEMP.length; i++) TEMP[i] = Math.random() * 2 - 1;
+    function chooseDistRnd(arr) {
       var idx = Math.random();
       idx *= idx;
       idx *= idx;
-      idx = (idx * (samples.length - 0.0001)) | 0;
-      var item = samples[idx];
+      idx = Math.floor(idx * (arr.length - 0.00001));
+      return arr[idx];
+    }
+
+    function putRandomDot() {
+      var item = chooseDistRnd(samples);
       trialCount++;
 
-      var dot = new Array(TEMP.length);
-      if (verifyDot(item, TEMP, dot)) {
+      ConfigurationInput.randomize(TEMP_INPUT);
+      var dot = Configuration.set(TEMP, item.pos);
+      ConfigurationInput.apply(dot, TEMP_INPUT);
+      Configuration.set(_this.trial, dot);
+      if (verifyDot(item, dot)) {
         var newItem = putNewItemByPos(dot, item);
+        _this.samplesSaved++;
         if (vec.dist2(dot, target) < resolution2) {
-          self.hasSolution = true;
+          _this.hasSolution = true;
           solutionSample = newItem;
         }
       } else {
-        if (self.wrongSampleCallback) {
-          self.wrongSampleCallback(dot);
+        if (_this.wrongSampleCallback) {
+          _this.wrongSampleCallback(dot);
         }
         item.fails++;
       }
@@ -129,8 +118,10 @@ define('planning.RrtInc', [
       samples.forEach(function(item) {
         item.score = itemScore(item);
       });
-      samples.sort(itemCmp);
-      helper.iterate(self, putRandomDot, sampleCnt);
+      if (Math.random() < 0.02) {
+        samples.sort(itemCmp);
+      }
+      helper.iterate(_this, putRandomDot, sampleCnt);
     }
 
     function getSolution() {
@@ -146,7 +137,9 @@ define('planning.RrtInc', [
       return helper.pathToRoot(parent, solutionSample, cost, mapToPos);
     }
 
+    this.trial = Configuration.create();
     this.samplesGenerated = 0;
+    this.samplesSaved = 0;
     this.continueForever = false;
     this.hasSolution = false;
     this.wrongSampleCallback = null;

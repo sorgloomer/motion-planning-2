@@ -74,7 +74,7 @@ define('math.vec', [], function() {
         return Math.sqrt(dist2(a, b));
     }
     function copy(a) {
-        return a.slice(0);
+        return new Float64Array(a);
     }
     function copyTo(b, a) {
         for (var i = 0, mi = a.length; i < mi; i++) {
@@ -94,7 +94,7 @@ define('math.vec', [], function() {
         return res;
     }
     function alloc(dims) {
-        return new Array(dims);
+        return new Float64Array(dims);
     }
     return {
         alloc: alloc,

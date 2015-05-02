@@ -3,7 +3,7 @@ define('planning.helper', [
 ], function(utils, Heap, vec) {
     var temp1 = new Array(4);
 
-    function checkLine(sampler, start, end, step, knownDistance) {
+    function checkLine(sampler, start, end, step, knownDistance, lerpTo) {
         if (step === undefined) step = 1;
         temp1.length = vec.dims(start);
 
@@ -12,7 +12,7 @@ define('planning.helper', [
         var inters = true;
         var inc = step / knownDistance;
         for (var i = inc; i < 1; i += inc) {
-            vec.lerpTo(temp1, start, end, i);
+            lerpTo(temp1, start, end, i);
             if (sampler(temp1)) {
                 inters = false;
                 break;
