@@ -4,13 +4,14 @@ var View = (function(Map, utils) {
   var VEC2_ZERO = [0, 0];
 
 
-  function View(model, viewport) {
-    this.model = model;
+  function View(viewmodel, viewport) {
+    this.viewmodel = viewmodel;
     this.viewport = viewport;
 
-    var definition = model.definition;
-    this.walls = createView(definition.walls, viewport, "walls");
-    this.agent = createView(definition.agent, viewport, "agent");
+    this.walls = createView(viewmodel.definition.walls, viewport, "walls");
+    this.agent = createView(viewmodel.definition.agent, viewport, "agent");
+    this.agent2 = createView(viewmodel.definition.agent, viewport, "agent2");
+    this.samples = [];
 
     // this.walls.appendChild(createTree(this.model.wallsTree, "rect"));
 
@@ -59,8 +60,28 @@ var View = (function(Map, utils) {
   }
 
 
+
+  var SampleDefinition = {
+    create: function(src, view) {
+      var elem = document.createElement('div');
+      elem.classList.add('sample');
+      view.viewport.appendChild(elem);
+      return elem;
+    },
+    update: function(dst, src, view) {
+      positionElement(dst, src[2], src[3], 0);
+    },
+    remove: function(dst, view) {
+      dst.remove();
+    }
+  };
+
   View.prototype.update = function update() {
-    positionElementSim(this.agent, this.model.agentPlacement);
+    positionElementSim(this.agent, this.viewmodel.agentPlacement);
+    positionElementSim(this.agent2, this.viewmodel.agentPlacement2);
+
+
+    utils.updateArray(this.samples, this.viewmodel.samples, SampleDefinition, this);
   };
 
   View.prototype.setHighlighted = function setHighlighted(flag){

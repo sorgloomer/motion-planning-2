@@ -8,95 +8,109 @@ define('planning.RrtVoronoi', [
     helper
 ) {
 
-    function RrtVoronoi(map) {
-        var self = this;
+  function RrtVoronoi(map) {
+    var _this = this;
 
-        var dims = map.nbox.dims();
-        var boxTree = new NBoxTree(map.nbox);
-        var resolution = map.resolution;
-        var resolution2 = resolution * resolution;
-        var greediness = 0.25;
+    var dims = map.nbox.dims();
+    var boxTree = new NBoxTree(map.nbox.fatten(2));
+    var resolution = map.resolution;
+    var targetDistance2 = map.targetDistance * map.targetDistance;
+    var greediness = 0.05;
 
-        var tempDot = vec.alloc(dims);
+    var Configuration = map.configuration;
+    var ConfigurationInput = Configuration.input;
 
-        var solutionNode = null;
-        var parentMap = new Map();
-        var edges = [];
-        var samples = [];
+    var TEMP_CONFIG = vec.alloc(dims);
 
-        putDot(map.start, null);
+    var solutionNode = null;
+    var parentMap = new Map();
+    var edges = [];
+    var samples = [];
+    var TEMP_INPUT = ConfigurationInput.create();
 
+    putConfig(map.start, null);
 
-        function putDot(dot, parent) {
-            boxTree.putDot(dot);
-            var len2 = vec.dist2(map.target, dot);
-            if (len2 < resolution2) {
-                solutionNode = dot;
-                self.hasSolution = true;
-            }
-            if (parent) {
-                parentMap.set(dot, parent);
-                edges.push([{pos: parent},{pos: dot}]);
-                samples.push({ pos: dot, parent: parent });
-            }
-        }
-
-        function stepInDirectionTo(outp, from, to, maxDistance, knownDistance) {
-            if (knownDistance === undefined) knownDistance = vec.dist(from, to);
-            vec.lerpTo(outp, from, to, maxDistance / knownDistance);
-        }
-
-        function stepLimitedInDirectionTo(outp, from, to, maxDistance, knownDistance) {
-            if (knownDistance === undefined) knownDistance = vec.dist(from, to);
-            if (knownDistance > maxDistance) {
-                vec.lerpTo(outp, from, to, maxDistance / knownDistance);
-            } else if (outp !== to) vec.copyTo(outp, to);
-        }
-
-        function putRandomDot() {
-            if (Math.random() < greediness) {
-                vec.copyTo(tempDot, map.target);
-            } else {
-                helper.randomDotInBox(map.nbox, tempDot, dims);
-                self.samplesGenerated++;
-            }
-            var nearest = boxTree.nearest(tempDot);
-            var knownDistance = vec.dist(nearest, tempDot);
-            var goodSample = false;
-
-            if (knownDistance > resolution) {
-                stepInDirectionTo(tempDot, nearest, tempDot, resolution, knownDistance);
-
-                var hitsWall = helper.checkLine(map.sampler, nearest, tempDot, 1, resolution);
-                if (!hitsWall) {
-                    goodSample = true;
-                    putDot(vec.copy(tempDot), nearest);
-                }
-            }
-
-            if (!goodSample && self.wrongSampleCallback) {
-                self.wrongSampleCallback(vec.copy(tempDot));
-            }
-        }
-
-        function iterate(trialCount) {
-            helper.iterate(self, putRandomDot, trialCount);
-        }
-
-        function getSolution() {
-            return helper.pathToRoot(parentMap, solutionNode, vec.dist);
-        }
-
-        this.samplesGenerated = 0;
-        this.continueForever = false;
-        this.edges = edges;
-        this.samples = samples;
-        this.wrongSampleCallback = null;
-        this.iterate = iterate;
-        this.hasSolution = false;
-        this.getSolution = getSolution;
+    function putConfig(config, parent) {
+      config = Configuration.copy(config);
+      boxTree.putDot(config);
+      var len2 = vec.dist2(map.target, config);
+      if (len2 < targetDistance2) {
+        solutionNode = config;
+        _this.hasSolution = true;
+      }
+      if (parent) {
+        parentMap.set(config, parent);
+        edges.push([{ pos: parent }, { pos: config }]);
+      }
+      samples.push({ pos: config, parent: parent });
     }
 
 
-    return RrtVoronoi;
+    function putRandomDot() {
+      if (Math.random() < greediness) {
+        vec.copyTo(TEMP_CONFIG, map.target);
+      } else {
+        Configuration.randomize(TEMP_CONFIG, map.nbox);
+        _this.samplesGenerated++;
+      }
+      var nearest = boxTree.nearest(TEMP_CONFIG);
+
+      Configuration.set(_this.conf_gen, TEMP_CONFIG);
+
+      var goodSample = false;
+
+
+
+      ConfigurationInput.randomize(TEMP_INPUT);
+      Configuration.set(TEMP_CONFIG, nearest);
+      ConfigurationInput.apply(TEMP_CONFIG, TEMP_INPUT);
+
+      var nextNearest = boxTree.nearest(TEMP_CONFIG);
+      var nextDist = Configuration.dist(nextNearest, TEMP_CONFIG);
+
+
+      if (nextDist > resolution) {
+        var hitsWall = helper.checkLine(map.sampler, nearest, TEMP_CONFIG, 1, resolution, Configuration.lerp);
+        if (!hitsWall) {
+          goodSample = true;
+          Configuration.set(_this.conf_trial, TEMP_CONFIG);
+          putConfig(TEMP_CONFIG, nearest);
+          _this.samplesSaved++;
+
+        }
+      }
+      Configuration.set(_this.conf_near, boxTree.nearest(map.target));
+
+
+      if (!goodSample && _this.wrongSampleCallback) {
+        _this.wrongSampleCallback(vec.copy(TEMP_CONFIG));
+      }
+    }
+
+    function iterate(trialCount) {
+      helper.iterate(_this, putRandomDot, trialCount);
+    }
+
+    function getSolution() {
+      return helper.pathToRoot(parentMap, solutionNode, vec.dist);
+    }
+
+    this.samplesGenerated = 0;
+    this.continueForever = false;
+    this.edges = edges;
+    this.samples = samples;
+    this.samplesSaved = 0;
+    this.wrongSampleCallback = null;
+    this.iterate = iterate;
+    this.hasSolution = false;
+    this.getSolution = getSolution;
+    this.conf_trial = Configuration.create();
+    this.conf_near = Configuration.create();
+    this.conf_gen = Configuration.create();
+    this.trialDist = 1e50;
+    this.boxTree = boxTree;
+  }
+
+
+  return RrtVoronoi;
 });

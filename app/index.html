@@ -19,17 +19,17 @@
       width: 100%;
     }
 
-    .agent, .walls {
+    .agent, .agent2, .walls, .box, .rect, .sample {
       position: absolute;
       display: block;
+    }
+    .agent, .agent2, .walls {
       width: 0;
       height: 0;
       border: none;
     }
 
     .box, .rect {
-      position: absolute;
-      display: block;
       width: 0;
       height: 0;
       border: 10px solid #070;
@@ -43,6 +43,11 @@
       border-color: #555;
       background-color: #aaa;
     }
+    .agent2 .box {
+      border-color: #555;
+      background-color: #aaa;
+      opacity: 0.5;
+    }
     .circle {
       border: 10px solid #600;
       background: #d00;
@@ -50,6 +55,14 @@
       height: 100px;
       border-radius: 50%;
     }
+
+    .sample {
+      border: none;
+      background: #d00;
+      width: 20px;
+      height: 20px;
+    }
+
     .highlight .box {
       border-color: #773;
       background: #ee5;
@@ -72,6 +85,7 @@
   <script src="lib/planning/planning/RrtVoronoi.js"></script>
   <script src="lib/planning/planning/RrtInc.js"></script>
   <script src="lib/planning/planning/helper.js"></script>
+
   <script src="lib/planning/utils/Heap.js"></script>
   <script src="lib/planning/utils/utils.js"></script>
 
@@ -81,12 +95,16 @@
   <script src="js/math/OBox.js"></script>
   <script src="js/collision/BoxTree.js"></script>
   <script src="js/collision/BoxTreeBuilder.js"></script>
+  <script src="js/experiment/CurvedPianoExperiment.js"></script>
+  <script src="js/experiment/ParkingExperiment.js"></script>
 
   <script src="js/model2d/Model.js"></script>
-  <script src="js/mvc/View.js"></script>
+  <script src="js/mvc/ViewModel.js"></script>
   <script src="js/model2d/ParkingConfig.js"></script>
   <script src="js/model2d/Configuration.js"></script>
+  <script src="js/mvc/View.js"></script>
   <script src="js/mvc/ParkingWorld.js"></script>
+  <script src="js/mvc/CurvedWorld.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

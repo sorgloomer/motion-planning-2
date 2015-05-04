@@ -1,13 +1,17 @@
 var ParkingConfig = (function() {
 
-  var DT = 0.40;
+  var DT = 0.6;
+  var TWO_PI = Math.PI * 2;
 
   function create() {
     return new Float32Array(6);
   }
 
   function load(config, model) {
-    similar2.setXYCS(model.agentPlacement,
+    return loadSample(model.agentPlacement, config);
+  }
+  function loadSample(viewmodel, config) {
+    similar2.setXYCS(viewmodel,
       config[0] * 10,
       config[1] * 10,
       config[2],
@@ -18,6 +22,9 @@ var ParkingConfig = (function() {
 
   function rspan(x) {
     return (Math.random() * 2 - 1) * x;
+  }
+  function rint(a, b) {
+    return (Math.random() * (b - a))  + a;
   }
 
   function randomizeInput(inp) {
@@ -68,14 +75,35 @@ var ParkingConfig = (function() {
     to[5] = a[5] * it + b[5] * t;
   }
 
+  function normalize(config) {
+    var len = Math.sqrt(config[2] * config[2] + config[3] * config[3]);
+    config[2] /= len;
+    config[3] /= len;
+    return config;
+  }
+
+  function randomize(config, nbox) {
+    config[0] = rint(nbox.min[0], nbox.max[0]);
+    config[1] = rint(nbox.min[1], nbox.max[1]);
+    var a = Math.random() * TWO_PI;
+    config[2] = Math.cos(a);
+    config[3] = Math.sin(a);
+    config[4] = rint(nbox.min[4], nbox.max[4]);
+    config[5] = rint(nbox.min[5], nbox.max[5]);
+    return config;
+  }
+
 
   return {
     create: create,
     copy: vecn.copy,
     load: load,
+    loadSample: loadSample,
     dist: vecn.dist,
     lerp: lerp,
     set: vecn.set,
+    normalize: normalize,
+    randomize: randomize,
     input: {
       create: createInput,
       apply: applyInput,
