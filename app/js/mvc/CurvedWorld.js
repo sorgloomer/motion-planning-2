@@ -27,9 +27,8 @@ var CurvedWorld = (function() {
       { size: [2,  5], pos: [  -15,   20.5], angle:   0 },
       { size: [2,  5], pos: [   15,   20.5], angle:   0 }
     ]
-      .concat(slice(2, 2, 26, 26, 0, -5, 62, 118, 9))
-  //.concat(slice(2, 2, 19, 19, 0, -5, 40, 140, 11))
-      .concat(slice(2, 2, 19, 19, 0, -6, 40, 140, 11))
+      .concat(slice(2, 2, 26, 26, 0, -5, 62, 118, 9))  // top curve
+      .concat(slice(2, 2, 19, 19, 0, -5, 40, 140, 11)) // bottom curve
     ;
 
 

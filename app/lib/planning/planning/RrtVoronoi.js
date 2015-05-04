@@ -56,6 +56,8 @@ define('planning.RrtVoronoi', [
       var nearest = boxTree.nearest(TEMP_CONFIG);
 
       Configuration.set(_this.conf_gen, TEMP_CONFIG);
+      //Configuration.set(_this.conf_near, boxTree.nearest(map.target));
+      Configuration.set(_this.conf_near, nearest);
 
       var goodSample = false;
 
@@ -65,6 +67,8 @@ define('planning.RrtVoronoi', [
       Configuration.set(TEMP_CONFIG, nearest);
       ConfigurationInput.apply(TEMP_CONFIG, TEMP_INPUT);
 
+      Configuration.set(_this.conf_trial, TEMP_CONFIG);
+
       var nextNearest = boxTree.nearest(TEMP_CONFIG);
       var nextDist = Configuration.dist(nextNearest, TEMP_CONFIG);
 
@@ -73,13 +77,11 @@ define('planning.RrtVoronoi', [
         var hitsWall = helper.checkLine(map.sampler, nearest, TEMP_CONFIG, 1, resolution, Configuration.lerp);
         if (!hitsWall) {
           goodSample = true;
-          Configuration.set(_this.conf_trial, TEMP_CONFIG);
           putConfig(TEMP_CONFIG, nearest);
           _this.samplesSaved++;
 
         }
       }
-      Configuration.set(_this.conf_near, boxTree.nearest(map.target));
 
 
       if (!goodSample && _this.wrongSampleCallback) {

@@ -1,13 +1,17 @@
-var Configuration = (function() {
+var CurvedPianoConfig = (function() {
 
-  var DT = 0.3;
+  var DT = 0.2;
+  var TWO_PI = Math.PI * 2;
 
   function create() {
     return new Float32Array(4);
   }
 
   function load(config, model) {
-    similar2.setXYCS(model.agentPlacement,
+    return loadSample(model.agentPlacement, config);
+  }
+  function loadSample(viewmodel, config) {
+    similar2.setXYCS(viewmodel,
       config[0] * 10,
       config[1] * 10,
       config[2],
@@ -19,6 +23,10 @@ var Configuration = (function() {
   function rspan(x) {
     return (Math.random() * 2 - 1) * x;
   }
+  function rint(a, b) {
+    return (Math.random() * (b - a))  + a;
+  }
+
 
   function randomizeInput(inp) {
     inp[0] = rspan(1.0);
@@ -39,6 +47,7 @@ var Configuration = (function() {
     config[0] += inp[0] * DT;
     config[1] += inp[1] * DT;
   }
+
   function createInput() {
     return vecn.create(3);
   }
@@ -59,10 +68,21 @@ var Configuration = (function() {
   }
 
 
+  function randomize(config, nbox) {
+    config[0] = rint(nbox.min[0], nbox.max[0]);
+    config[1] = rint(nbox.min[1], nbox.max[1]);
+    var a = Math.random() * TWO_PI;
+    config[2] = Math.cos(a);
+    config[3] = Math.sin(a);
+    return config;
+  }
+
   return {
     create: create,
+    randomize: randomize,
     copy: vecn.copy,
     load: load,
+    loadSample: loadSample,
     dist: vecn.dist,
     lerp: lerp,
     set: vecn.set,

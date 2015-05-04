@@ -13,7 +13,7 @@
 
   function setupModel() {
     viewport = document.getElementById('viewport');
-    experiment = new ParkingExperiment();
+    experiment = new CurvedPianoExperiment();
     viewmodel = new ViewModel(experiment.model.definition);
     view = new View(viewmodel, viewport);
 
@@ -38,7 +38,7 @@
   function cycle() {
 
     if (!solution) {
-      for (var i = 0; i < 20; i++) {
+      for (var i = 0; i < 50; i++) {
         solver.iterate();
       }
       if (solver.hasSolution) {
@@ -64,7 +64,7 @@
         }
         solT += solSpeed;
       }
-      viewmodel.pullAnim(solver, config);
+      viewmodel.pullAnim(solver, config, MyConfigSpace);
     }
 
     view.setHighlighted(experiment.model.isValid());

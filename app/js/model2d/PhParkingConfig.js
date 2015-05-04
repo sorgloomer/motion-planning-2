@@ -1,10 +1,10 @@
-var ParkingConfig = (function() {
+var PhParkingConfig = (function() {
 
-  var DT = 0.15;
+  var DT = 0.1;
   var TWO_PI = Math.PI * 2;
 
   function create() {
-    return new Float32Array(4);
+    return new Float32Array(6);
   }
 
   function load(config, model) {
@@ -33,9 +33,9 @@ var ParkingConfig = (function() {
   }
 
   function applyInput(config, inp) {
-    var dpos = inp[0] * DT;
+    var dpos = config[4] * DT;
 
-    var a = dpos * inp[1];
+    var a = dpos * config[5];
     var sina = Math.sin(a), cosa = Math.cos(a);
 
     var nx =  config[2] * cosa + config[3] * sina;
@@ -45,6 +45,8 @@ var ParkingConfig = (function() {
     config[1] -= dpos * config[2];
     config[2] = nx;
     config[3] = ny;
+    config[4] = clamp(config[4] + inp[0] * DT, 1.0);
+    config[5] = clamp(config[5] + inp[1] * DT, 2.4);
   }
 
   function clamp(a, x) {
@@ -69,6 +71,8 @@ var ParkingConfig = (function() {
     to[1] = a[1] * it + b[1] * t;
     to[2] = sinO1 * a[2] + sinO2 * b[2];
     to[3] = sinO1 * a[3] + sinO2 * b[3];
+    to[4] = a[4] * it + b[4] * t;
+    to[5] = a[5] * it + b[5] * t;
   }
 
   function normalize(config) {
@@ -84,6 +88,8 @@ var ParkingConfig = (function() {
     var a = Math.random() * TWO_PI;
     config[2] = Math.cos(a);
     config[3] = Math.sin(a);
+    config[4] = rint(nbox.min[4], nbox.max[4]);
+    config[5] = rint(nbox.min[5], nbox.max[5]);
     return config;
   }
 

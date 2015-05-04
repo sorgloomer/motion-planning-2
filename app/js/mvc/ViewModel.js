@@ -20,17 +20,18 @@ var ViewModel = (function() {
 
   ViewModel.prototype.pullSolver = function(solver, configuration) {
     this._configSpace = configuration;
-    utils.updateArray(this.samples, solver.samples, SampleDefinition, this);
+    utils.updateArray(this.samples, solver.samples.slice(-1000), SampleDefinition, this);
 
     if (solver.conf_gen) {
-      configuration.loadSample(this.agentPlacement, solver.conf_gen);
+      configuration.loadSample(this.agentPlacement, solver.conf_near);
     }
     if (solver.conf_trial) {
       configuration.loadSample(this.agentPlacement2, solver.conf_trial);
     }
   };
-  ViewModel.prototype.pullAnim = function(placement) {
-    similar2.set(this.agentPlacement, placement);
+  ViewModel.prototype.pullAnim = function(solver, placement, configuration) {
+    configuration.loadSample(this.agentPlacement, placement);
+    configuration.loadSample(this.agentPlacement2, solver.conf_trial);
   };
 
   return ViewModel;

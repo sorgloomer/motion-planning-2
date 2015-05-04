@@ -11,7 +11,7 @@ var ParkingWorld = (function() {
 
 
   var SHAPE_WALLS = [
-      { size: [28, 30], pos: [  -32,      0], angle:   0 },
+      { size: [25, 30], pos: [  -32,      0], angle:   0 },
       { size: [15, 30], pos: [   28,      0], angle:   0 },
       { size: [40,  5], pos: [    0,    -30], angle:   0 },
       { size: [40, 10], pos: [    0,     30], angle:   0 },
