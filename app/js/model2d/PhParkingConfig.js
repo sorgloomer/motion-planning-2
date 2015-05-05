@@ -29,7 +29,7 @@ var PhParkingConfig = (function() {
 
   function randomizeInput(inp) {
     inp[0] = rspan(1.0);
-    inp[1] = rspan(1.5);
+    inp[1] = rspan(2.0);
   }
 
   function applyInput(config, inp) {

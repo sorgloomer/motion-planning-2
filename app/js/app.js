@@ -1,8 +1,10 @@
 (function() {
   "use strict";
 
-  var NBox = require('math.NBox');
   var SelectedAlgorithm = require('planning.RrtVoronoi');
+  var Experiment = PhParkingExperiment;
+  
+  var NBox = require('math.NBox');
   var totalTime = 0;
   var view, viewport, viewmodel;
 
@@ -13,7 +15,7 @@
 
   function setupModel() {
     viewport = document.getElementById('viewport');
-    experiment = new CurvedPianoExperiment();
+    experiment = new Experiment();
     viewmodel = new ViewModel(experiment.model.definition);
     view = new View(viewmodel, viewport);
 

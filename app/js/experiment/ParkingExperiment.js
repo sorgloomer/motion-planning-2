@@ -19,7 +19,7 @@ function ParkingExperiment() {
 
   _this.nbox = new NBox(
     [ -0.6, -2.4, -1.1, -1.1 ],
-    [  1.0,  2.0,  1.1,  1.1 ]
+    [  1.2,  2.0,  1.1,  1.1 ]
   );
   _this.configuration = ParkingConfig;
   _this.model = new Model(ParkingWorld);
