@@ -23,7 +23,7 @@ function PhParkingExperiment() {
   function sampler(dot) {
     var model = _this.model;
     ++_this.samplesTook;
-    Config.load(dot, model);
+    Config.loadModel(dot, model);
     return model.isValid();
   }
 }

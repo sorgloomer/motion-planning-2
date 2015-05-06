@@ -2,7 +2,7 @@
   "use strict";
 
   var SelectedAlgorithm = require('planning.RrtVoronoi');
-  var Experiment = PhParkingExperiment;
+  var Experiment = ArmExperiment;
   
   var NBox = require('math.NBox');
   var totalTime = 0;

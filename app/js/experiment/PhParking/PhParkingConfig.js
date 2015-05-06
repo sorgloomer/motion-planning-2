@@ -8,7 +8,7 @@ var PhParkingConfig = (function() {
   }
 
   function load(config, model) {
-    return loadSample(model.agentPlacement, config);
+    return loadSample(model.agents[0].placement, config);
   }
   function loadSample(viewmodel, config) {
     similar2.setXYCS(viewmodel,

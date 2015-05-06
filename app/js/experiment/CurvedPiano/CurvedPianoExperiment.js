@@ -16,7 +16,7 @@ function CurvedPianoExperiment() {
   function sampler(dot) {
     var model = _this.model;
     ++_this.samplesTook;
-    CurvedPianoConfig.load(dot, model);
+    CurvedPianoConfig.loadModel(dot, model);
     return model.isValid();
   }
 }

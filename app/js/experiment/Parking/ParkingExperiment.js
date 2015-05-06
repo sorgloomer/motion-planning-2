@@ -28,7 +28,7 @@ function ParkingExperiment() {
   function sampler(dot) {
     var model = _this.model;
     ++_this.samplesTook;
-    ParkingConfig.load(dot, model);
+    ParkingConfig.loadModel(dot, model);
     return model.isValid();
   }
 }

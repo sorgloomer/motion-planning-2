@@ -1,22 +1,34 @@
-var CurvedPianoConfig = (function() {
+var ParkingConfig = (function() {
 
-  var DT = 0.2;
+  var DT = 0.15;
   var TWO_PI = Math.PI * 2;
 
   function create() {
     return new Float32Array(4);
   }
 
-  function load(config, model) {
-    return loadSample(model.agentPlacement, config);
+  function loadModel(config, model) {
+    return loadView(indexer, config);
+    function indexer() {
+      return model.agents[0].placement;
+    }
   }
-  function loadSample(viewmodel, config) {
-    similar2.setXYCS(viewmodel,
-      config[0] * 10,
-      config[1] * 10,
-      config[2],
-      config[3]
-    );
+  function loadSample(simil, config) {
+    return loadView(indexer, config);
+    function indexer() {
+      return simil;
+    }
+  }
+  function loadView(indexer, config) {
+    var placement = indexer(0);
+    if (placement) {
+      similar2.setXYCS(placement,
+        config[0] * 10,
+        config[1] * 10,
+        config[2],
+        config[3]
+      );
+    }
     return config;
   }
 
@@ -27,34 +39,38 @@ var CurvedPianoConfig = (function() {
     return (Math.random() * (b - a))  + a;
   }
 
-
   function randomizeInput(inp) {
     inp[0] = rspan(1.0);
-    inp[1] = rspan(1.0);
-    inp[2] = rspan(1.0);
+    inp[1] = rspan(1.5);
   }
 
   function applyInput(config, inp) {
-    var a = inp[2] * DT;
+    var dpos = inp[0] * DT;
+
+    var a = dpos * inp[1];
     var sina = Math.sin(a), cosa = Math.cos(a);
-    var newx = config[2] * cosa + config[3] * sina;
-    var newy = -config[2] * sina + config[3] * cosa;
 
-    config[2] = newx;
-    config[3] = newy;
+    var nx =  config[2] * cosa + config[3] * sina;
+    var ny = -config[2] * sina + config[3] * cosa;
 
+    config[0] += dpos * config[3];
+    config[1] -= dpos * config[2];
+    config[2] = nx;
+    config[3] = ny;
+  }
 
-    config[0] += inp[0] * DT;
-    config[1] += inp[1] * DT;
+  function clamp(a, x) {
+    if (a > x) return x;
+    if (a < -x) return -x;
+    return a;
   }
 
   function createInput() {
-    return vecn.create(3);
+    return vecn.create(2);
   }
 
   function lerp(to, a, b, t) {
     var it = 1 - t;
-
 
     var omega = Math.acos(a[2] * b[2] + a[3] * b[3]);
     var sinOmega = Math.sin(omega);
@@ -67,6 +83,12 @@ var CurvedPianoConfig = (function() {
     to[3] = sinO1 * a[3] + sinO2 * b[3];
   }
 
+  function normalize(config) {
+    var len = Math.sqrt(config[2] * config[2] + config[3] * config[3]);
+    config[2] /= len;
+    config[3] /= len;
+    return config;
+  }
 
   function randomize(config, nbox) {
     config[0] = rint(nbox.min[0], nbox.max[0]);
@@ -77,15 +99,18 @@ var CurvedPianoConfig = (function() {
     return config;
   }
 
+
   return {
     create: create,
-    randomize: randomize,
     copy: vecn.copy,
-    load: load,
+    loadModel: loadModel,
     loadSample: loadSample,
+    loadView: loadView,
     dist: vecn.dist,
     lerp: lerp,
     set: vecn.set,
+    normalize: normalize,
+    randomize: randomize,
     input: {
       create: createInput,
       apply: applyInput,

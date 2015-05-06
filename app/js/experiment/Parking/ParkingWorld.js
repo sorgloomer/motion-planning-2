@@ -21,13 +21,12 @@ var ParkingWorld = (function() {
       { size: [2, 4], pos: [   10,  -10.0], angle:   0 },
       { size: [2, 4], pos: [   10,   10.0], angle:   0 },
       { size: [2, 4], pos: [   10,   20.0], angle:   0 }
-    ]
-    ;
+    ];
 
 
   return {
     walls: SHAPE_WALLS,
-    agent: SHAPE_CAR,
+    agents: [ SHAPE_CAR ],
     start: { pos: [-5, -18], angle: 0 },
     target: { pos: [12, -2], angle: 0 },
     hsize: [60, 40]

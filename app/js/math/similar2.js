@@ -31,7 +31,10 @@ var similar2 = (function(Float32Array, Array, Math) {
   }
 
   function set(output, sim){
-    output.set(sim, 0);
+    output[0] = sim[0];
+    output[1] = sim[1];
+    output[2] = sim[2];
+    output[3] = sim[3];
     return output;
   }
 

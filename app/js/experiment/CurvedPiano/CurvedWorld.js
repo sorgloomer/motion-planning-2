@@ -34,7 +34,7 @@ var CurvedWorld = (function() {
 
   return {
     walls: SHAPE_WALLS,
-    agent: SHAPE_U,
+    agents: [ SHAPE_U ],
     start: { pos: [-26, -20], angle: 0 },
     target: { pos: [26, -20], angle: 0 },
     hsize: [60, 40]

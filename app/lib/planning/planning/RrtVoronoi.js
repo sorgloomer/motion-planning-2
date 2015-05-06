@@ -11,6 +11,8 @@ define('planning.RrtVoronoi', [
   function RrtVoronoi(map) {
     var _this = this;
 
+    var NEARING_TRIALS = 1;
+
     var dims = map.nbox.dims();
     var boxTree = new NBoxTree(map.nbox.fatten(2));
     var resolution = map.resolution;
@@ -20,13 +22,17 @@ define('planning.RrtVoronoi', [
     var Configuration = map.configuration;
     var ConfigurationInput = Configuration.input;
 
-    var TEMP_CONFIG = vec.alloc(dims);
 
     var solutionNode = null;
     var parentMap = new Map();
     var edges = [];
     var samples = [];
+
     var TEMP_INPUT = ConfigurationInput.create();
+    var TEMP_INPUT2 = ConfigurationInput.create();
+    var TEMP_CONFIG = Configuration.create();
+    var TEMP_CONFIG2 = Configuration.create();
+    var TEMP_CONFIG3 = Configuration.create();
 
     putConfig(map.start, null);
 
@@ -46,46 +52,72 @@ define('planning.RrtVoronoi', [
     }
 
 
+
     function putRandomDot() {
+
+      var temp, i, saved_dist, current_dist;
+      var config_random_target = TEMP_CONFIG;
+      var config_saved = TEMP_CONFIG2;
+      var config_current = TEMP_CONFIG3;
+      var input_saved = TEMP_INPUT;
+      var input_current = TEMP_INPUT2;
+
       if (Math.random() < greediness) {
-        vec.copyTo(TEMP_CONFIG, map.target);
+        vec.copyTo(config_random_target, map.target);
       } else {
-        Configuration.randomize(TEMP_CONFIG, map.nbox);
+        Configuration.randomize(config_random_target, map.nbox);
         _this.samplesGenerated++;
       }
-      var nearest = boxTree.nearest(TEMP_CONFIG);
+      var nearest = boxTree.nearest(config_random_target);
 
-      Configuration.set(_this.conf_gen, TEMP_CONFIG);
+      Configuration.set(_this.conf_gen, config_random_target);
       //Configuration.set(_this.conf_near, boxTree.nearest(map.target));
       Configuration.set(_this.conf_near, nearest);
 
       var goodSample = false;
 
 
+      ConfigurationInput.randomize(input_saved);
+      Configuration.set(config_saved, nearest);
+      ConfigurationInput.apply(config_saved, input_saved);
+      saved_dist = vecn.dist(config_saved, config_random_target);
 
-      ConfigurationInput.randomize(TEMP_INPUT);
-      Configuration.set(TEMP_CONFIG, nearest);
-      ConfigurationInput.apply(TEMP_CONFIG, TEMP_INPUT);
+      for (i = 0; i < NEARING_TRIALS; i++) {
+        ConfigurationInput.randomize(input_current);
+        Configuration.set(config_current, nearest);
+        ConfigurationInput.apply(config_current, input_current);
+        current_dist = vecn.dist(config_current, config_random_target);
+        if (current_dist < saved_dist) {
+          saved_dist = current_dist;
 
-      Configuration.set(_this.conf_trial, TEMP_CONFIG);
+          temp = config_saved;
+          config_saved = config_current;
+          config_current = temp;
 
-      var nextNearest = boxTree.nearest(TEMP_CONFIG);
-      var nextDist = Configuration.dist(nextNearest, TEMP_CONFIG);
+          temp = input_saved;
+          input_saved = input_current;
+          input_current = temp;
+        }
+      }
+
+      Configuration.set(_this.conf_trial, config_saved);
+
+      var nextNearest = boxTree.nearest(config_saved);
+      var nextDist = Configuration.dist(nextNearest, config_saved);
 
 
       if (nextDist > resolution) {
-        var hitsWall = helper.checkLine(map.sampler, nearest, TEMP_CONFIG, 1, resolution, Configuration.lerp);
+        var hitsWall = helper.checkLine(map.sampler, nearest, config_saved, 1, resolution, Configuration.lerp);
         if (!hitsWall) {
           goodSample = true;
-          putConfig(TEMP_CONFIG, nearest);
+          putConfig(config_saved, nearest);
           _this.samplesSaved++;
-
         }
       }
 
 
       if (!goodSample && _this.wrongSampleCallback) {
-        _this.wrongSampleCallback(vec.copy(TEMP_CONFIG));
+        _this.wrongSampleCallback(vec.copy(config_saved));
       }
     }
 

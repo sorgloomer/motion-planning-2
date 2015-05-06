@@ -9,8 +9,14 @@ var View = (function(Map, utils) {
     this.viewport = viewport;
 
     this.walls = createView(viewmodel.definition.walls, viewport, "walls");
-    this.agent = createView(viewmodel.definition.agent, viewport, "agent");
-    this.agent2 = createView(viewmodel.definition.agent, viewport, "agent2");
+
+    this.agents = viewmodel.definition.agents.map(function(agentDef) {
+      return createView(agentDef, viewport, "agent");
+    });
+    this.agents2 = viewmodel.definition.agents.map(function(agentDef) {
+      return createView(agentDef, viewport, "agent2");
+    });
+
     this.samples = [];
 
     // this.walls.appendChild(createTree(this.model.wallsTree, "rect"));
@@ -77,19 +83,29 @@ var View = (function(Map, utils) {
   };
 
   View.prototype.update = function update() {
-    positionElementSim(this.agent, this.viewmodel.agentPlacement);
-    positionElementSim(this.agent2, this.viewmodel.agentPlacement2);
-
+    var i, arr1, arr2;
+    arr1 = this.agents;
+    arr2 = this.viewmodel.agents;
+    for (i = 0; i < arr1.length; i++) {
+      positionElementSim(arr1[i], arr2[i]);
+    }
+    arr1 = this.agents2;
+    arr2 = this.viewmodel.agents2;
+    for (i = 0; i < arr1.length; i++) {
+      positionElementSim(arr1[i], arr2[i]);
+    }
 
     utils.updateArray(this.samples, this.viewmodel.samples, SampleDefinition, this);
   };
 
   View.prototype.setHighlighted = function setHighlighted(flag){
-    if (flag) {
-      this.agent.classList.add('highlight');
-    } else {
-      this.agent.classList.remove('highlight');
-    }
+    this.agents.forEach(function(agent) {
+      if (flag) {
+        agent.classList.add('highlight');
+      } else {
+        agent.classList.remove('highlight');
+      }
+    });
   };
 
   function cssMatrix(x, y, angle) {
