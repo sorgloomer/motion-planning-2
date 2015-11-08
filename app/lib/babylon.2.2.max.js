@@ -15357,7 +15357,7 @@ var BABYLON;
             return results;
         };
         Mesh.prototype.getHierarchyEmittedParticleSystems = function () {
-            var results = new Array();
+            var results = [];
             var descendants = this.getDescendants();
             descendants.push(this);
             for (var index = 0; index < this.getScene().particleSystems.length; index++) {
@@ -15369,9 +15369,9 @@ var BABYLON;
             return results;
         };
         Mesh.prototype.getChildren = function () {
-            var results = [];
-            for (var index = 0; index < this.getScene().meshes.length; index++) {
-                var mesh = this.getScene().meshes[index];
+            var results = [], meshes = this.getScene().meshes;
+            for (var index = 0; index < meshes.length; index++) {
+                var mesh = meshes[index];
                 if (mesh.parent === this) {
                     results.push(mesh);
                 }
