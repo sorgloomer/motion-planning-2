@@ -43,44 +43,44 @@ export default class OBoxCollider {
     this._tempVec1 = Vec3.create();
     this._tempVec2 = Vec3.create();
   }
+
   collide(ba, bb) {
+    return penetration(ba, bb) > 0;
+  }
+
+  penetration(ba, bb) {
     const temp1 = this._tempVec1;
     const temp2 = this._tempVec2;
     const transA = ba.transform;
     const transB = ba.transform;
     const verticesA = this._verticesA;
     const verticesB = this._verticesB;
-    const radsum = ba.radius + bb.radius;
+
     var minPenetration = 0;
-    Sim3.getT(temp1, transA);
-    Sim3.getT(temp2, transB);
-    if (Vec3.dist2(temp1, temp2) > radsum * radsum) {
-      return -radsum;
-    } else {
-      _getBoxVertices(verticesA, ba);
-      _getBoxVertices(verticesB, bb);
 
-      Sim3.getX(temp1, transA);  minPenetration = distDir();
-      Sim3.getY(temp1, transA);  aggregate();
-      Sim3.getZ(temp1, transA);  aggregate();
+    _getBoxVertices(verticesA, ba);
+    _getBoxVertices(verticesB, bb);
 
-      Sim3.getX(temp1, transB);  aggregate();
-      Sim3.getY(temp1, transB);  aggregate();
-      Sim3.getZ(temp1, transB);  aggregate();
+    Sim3.getX(temp1, transA);  minPenetration = distDir();
+    Sim3.getY(temp1, transA);  aggregate();
+    Sim3.getZ(temp1, transA);  aggregate();
 
-      // Vec3.crossIP stores result in temp1
-      Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
-      Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
+    Sim3.getX(temp1, transB);  aggregate();
+    Sim3.getY(temp1, transB);  aggregate();
+    Sim3.getZ(temp1, transB);  aggregate();
 
-      return minPenetration;
-    }
+    // Vec3.crossIP stores result in temp1
+    Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
+    Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
+
+    return minPenetration;
 
     function distDir() {
       return maxDir(verticesA, temp1) - minDir(verticesB, temp1);
