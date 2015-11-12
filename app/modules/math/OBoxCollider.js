@@ -4,7 +4,7 @@ import OBox from '/math/OBox';
 
 const {min} = Math;
 
-function minDirXYZ(vertices, dx, dy, dz) {
+function minBoundByDirXYZ(vertices, dx, dy, dz) {
   var res = Vec3.dotXYZ(vertices[0], dx, dy, dz);
   for (var i = 1; i < vertices.length; i++) {
     var curr = dotXYZ(vertices[i], dx, dy, dz);
@@ -12,14 +12,14 @@ function minDirXYZ(vertices, dx, dy, dz) {
   }
   return res;
 }
-function maxDirXYZ(vertices, dx, dy, dz) {
-  return -minDirXYZ(vertices, -dx, -dy, -dz)
+function maxBoundByDirXYZ(vertices, dx, dy, dz) {
+  return -minBoundByDirXYZ(vertices, -dx, -dy, -dz)
 }
-function minDir(vertices, d) {
-  return minDirXYZ(vertices, d[0], d[1], d[2]);
+function minBoundByDir(vertices, d) {
+  return minBoundByDirXYZ(vertices, d[0], d[1], d[2]);
 }
-function maxDir(vertices, d) {
-  return maxDirXYZ(vertices, d[0], d[1], d[2]);
+function maxBoundByDir(vertices, d) {
+  return maxBoundByDirXYZ(vertices, d[0], d[1], d[2]);
 }
 
 function _getBoxVertices(to, box) {
@@ -48,6 +48,16 @@ export default class OBoxCollider {
     return penetration(ba, bb) > 0;
   }
 
+  maxBoxBoundByDir(box, dir) {
+    const verticesA = this._verticesA;
+    _getBoxVertices(verticesA, box);
+    return maxBoundByDir(verticesA, dir);
+  }
+  minBoxBoundByDir(box, dir) {
+    const verticesA = this._verticesA;
+    _getBoxVertices(verticesA, box);
+    return minBoundByDir(verticesA, dir);
+  }
   penetration(ba, bb) {
     const temp1 = this._tempVec1;
     const temp2 = this._tempVec2;
@@ -83,7 +93,7 @@ export default class OBoxCollider {
     return minPenetration;
 
     function distDir() {
-      return maxDir(verticesA, temp1) - minDir(verticesB, temp1);
+      return maxBoundByDir(verticesA, temp1) - minBoundByDir(verticesB, temp1);
     }
     function aggregate() {
       minPenetration = min(minPenetration, distDir());

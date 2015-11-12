@@ -7,6 +7,9 @@ export default class OBox {
     this.hsize = this._buffer.subarray(0, 3);
     this.transform = this._buffer.subarray(3, 16);
   }
+  volume() {
+    return 8 * this.hsize[0] * this.hsize[1] * this.hsize[2];
+  }
   set(other) {
     this._buffer.set(other._buffer, 0);
   }

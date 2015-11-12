@@ -240,6 +240,14 @@ function getT(to, s) {
   return to;
 }
 
+function setRotationVecs(to, r0, r1, r2) {
+  to[0] = r0[0]; to[1] = r0[1]; to[2] = r0[2];
+  to[3] = r1[0]; to[4] = r1[1]; to[5] = r1[2];
+  to[6] = r2[0]; to[7] = r2[1]; to[8] = r2[2];
+  to[9] = 0; to[10] = 0; to[11] = 0;
+  return to;
+}
+
 export default {
   DIMS: 3,
   create,
@@ -275,6 +283,8 @@ export default {
   setRotationEulerScale,
 
   transposeTo,
-  invertTo
+  invertTo,
+
+  setRotationVecs
 };
 

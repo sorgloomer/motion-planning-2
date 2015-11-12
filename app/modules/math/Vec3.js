@@ -144,6 +144,20 @@ function crossTo(to, a, b) {
 function crossIP(a, b) {
   return crossTo(a, a, b);
 }
+function cross(a, b) {
+  return crossTo(create(), a, b);
+}
+
+function normalizeTo(to, a) {
+  return scaleTo(to, a, 1 / len(a));
+}
+
+function normalize(a) {
+  return normalizeTo(create(), a);
+}
+function normalizeIP(a) {
+  return normalizeTo(a, a);
+}
 
 export default {
   DIMS: 3,
@@ -168,6 +182,7 @@ export default {
   dot,
   dotXYZ,
 
+  cross,
   crossTo,
   crossIP,
 
@@ -182,6 +197,10 @@ export default {
   len,
   len2,
   dist,
-  dist2
+  dist2,
+
+  normalize,
+  normalizeTo,
+  normalizeIP
 };
 
