@@ -22,7 +22,7 @@ export function OBox_makePlacement(sx, sy, sz, cx, cy, cz, rx, ry, rz, ang) {
 
 export function makeRing(radius, thickness, segments, sim = null) {
   const width = 2 * tan(PI / segments) * (radius + thickness / 2);
-  return [lists.generate(segments, i => {
+  return lists.generate(segments, i => {
     const a = i / segments * TWO_PI;
     const res = OBox_makePlacement(
       thickness, thickness, width,
@@ -31,7 +31,7 @@ export function makeRing(radius, thickness, segments, sim = null) {
     );
     if (sim) Sim3.mulIP(res.transform, sim);
     return res;
-  })[2]];
+  });
 }
 
 export default {

@@ -99,11 +99,15 @@ export default class OBoxCollider {
         Vec3.scaleIP(ref_a, 1 / sqrt(l2));
         aggregate();
       } else {
-        debugger;
+        // debugger;
       }
     }
     function distDir() {
-      return maxBoundByDir(verticesA, temp1) - minBoundByDir(verticesB, temp1);
+      const maxa = maxBoundByDir(verticesA, temp1);
+      const mina = minBoundByDir(verticesA, temp1);
+      const maxb = maxBoundByDir(verticesB, temp1);
+      const minb = minBoundByDir(verticesB, temp1);
+      return Math.min(maxa - minb, maxb - mina);
     }
     function aggregate() {
       const curr = distDir();

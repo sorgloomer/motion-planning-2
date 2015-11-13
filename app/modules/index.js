@@ -18,7 +18,7 @@ const canvas = document.getElementById("render-canvas");
 const engine = new BABYLON.Engine(canvas, true);
 
 const ring2_boxes = DefinitionHelper.makeRing(
-  3.5, 1, 5, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 9, 5, 3)
+  3.5, 1, 16, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 9, 5, 3)
 );
 const ring2_tree = (new BoxTreeBuilder()).buildBoxTree(ring2_boxes);
 
@@ -199,7 +199,7 @@ loaded(() => {
 
         Sim3.setRotationAxisAngleXYZ(sim,
           0,
-          3.9,
+          3.9 + 0.0007*time,
           0);
         Sim3.translateXYZ(sim,
           6,
