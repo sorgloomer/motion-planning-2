@@ -1,11 +1,21 @@
 import Vec3 from '/math/Vec3';
+import OBox from '/math/solids/OBox';
 
 export default class BoxTreeNode {
   constructor(obox = null, children = null) {
-    this.obox = obox ? obox.clone() : new OBox();
-    this.volume = obox.volume();
-    this.radius = Vec3.len(this.obox.hsize);
+    const my_obox = obox ? obox.clone() : new OBox();
+    this.obox = my_obox;
+    this.volume = my_obox.volume();
+    this.radius = Vec3.len(my_obox.hsize);
     this.children = children;
+    this._hit = false;
+  }
+
+  visit(cb) {
+    cb(this);
+    if (this.children) {
+      this.children.forEach(c => c.visit(cb));
+    }
   }
 
   set(node) {

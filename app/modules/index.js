@@ -1,6 +1,13 @@
 import BABYLON from '/shim/babylon';
 import loaded from '/utils/loaded';
 import { DEG_TO_RAD, PI } from '/utils/math';
+import Sim3 from '/math/Sim3';
+import MeshHelper from '/graphics/MeshHelper';
+import DefinitionHelper from '/experiment/common/DefinitionHelper';
+
+import DroneModel from '/experiment/drone/common/drone_boxes';
+import BoxTreeCollider from '/collision/BoxTreeCollider';
+import BoxTreeBuilder from '/collision/BoxTreeBuilder';
 
 document.getElementById("main-area").addEventListener('click', () => {
 
@@ -9,6 +16,12 @@ document.getElementById("main-area").addEventListener('click', () => {
 const canvas = document.getElementById("render-canvas");
 
 const engine = new BABYLON.Engine(canvas, true);
+
+const ring2_boxes = DefinitionHelper.makeRing(
+  3.5, 1, 5, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 9, 5, 3)
+);
+const ring2_tree = (new BoxTreeBuilder()).buildBoxTree(ring2_boxes);
+
 
 
 function buildCopterMaterial(name, scene) {
@@ -68,11 +81,10 @@ function buildCopter(name, material, scene) {
     return pivot;
 }
 
-
 function pushAll(arr, items) {
     arr.push(...items);
 }
-function createScene() {
+function createScene(oboxes, tree1) {
     var scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.7, 0.9, 1);
     var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -4), scene);
@@ -96,6 +108,8 @@ function createScene() {
     var copter1 = buildCopter('copter1', mat_copter, scene);
     copter1.position.y = 0.8;
 
+    var boxes1 = MeshHelper.meshFromOBoxList('boxes1', scene, oboxes, m => m.material = mat_copter);
+
     /*
     // Skybox
     var skybox = BABYLON.Mesh.CreateBox("skyBox", 500.0, scene);
@@ -114,14 +128,17 @@ function createScene() {
     ring_mat.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
     ring_mat.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 
+    var mat_wireframe = new BABYLON.StandardMaterial("mat_wireframe", scene);
+    mat_wireframe.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
+    mat_wireframe.specularColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+    mat_wireframe.wireframe = true;
+
+
+
     var ring1 = BABYLON.Mesh.CreateTorus('ring1', 7, 1, 32, scene);
     ring1.material = ring_mat;
-    ring1.position = new BABYLON.Vector3(9, 5, 1);
+    ring1.position = new BABYLON.Vector3(19, 5, 1);
     ring1.rotation.x = PI/2;
-    var ring2 = BABYLON.Mesh.CreateTorus('ring2', 7, 1, 32, scene);
-    ring2.material = ring_mat;
-    ring2.position = new BABYLON.Vector3(9, 5, -1);
-    ring2.rotation.x = PI/2;
 
 
     var platform_mat = new BABYLON.StandardMaterial("platform", scene);
@@ -141,26 +158,71 @@ function createScene() {
     var shadowGenerator = new BABYLON.ShadowGenerator(1024, light_dir);
     shadowGenerator.usePoissonSampling = true;
 
+    const allObjects = [];
+
+
+    const ring2 = MeshHelper.meshFromOBoxList('ring2', scene, ring2_boxes, b => b.material = ring_mat && null);
+    allObjects.push(ring2);
+
+
     const shadowCasters = shadowGenerator.getShadowMap().renderList;
-    const allObjects = [ring1, ring2, platform].concat(copter1.my_children);
+    allObjects.push(ring1, platform);
+    allObjects.push(...copter1.my_children);
+    allObjects.push(...boxes1.my_children);
+
     pushAll(shadowCasters, allObjects);
 
+
+    const m_tree1 = MeshHelper.meshFromOBoxTree('m_tree1', scene, ring2_tree, true, (mesh, node) => mesh.material = mat_wireframe);
+    const m_tree2 = MeshHelper.meshFromOBoxTree('m_tree2', scene, tree1, true, (mesh, node) => mesh.material = mat_wireframe);
+
+
+    /*
+    boxes1.position.y = 4;
+    m_tree1.position.y = 4;
+    */
     [ground].concat(allObjects).forEach(m => { m.receiveShadows = true; });
 
-
-
-    return { scene, copter1, mat_copter, ring1, ring2 };
+    return { scene, copter1, mat_copter, ring1, ring2_boxes, boxes1, m_tree1, m_tree2 };
 }
 
 loaded(() => {
-    const scene = createScene();
+
+
+    const scene = createScene(DroneModel.boxList, DroneModel.boxTree);
+    const sim = Sim3.create();
+    const collider = new BoxTreeCollider();
+
     const startTime = Date.now();
     engine.runRenderLoop(() => {
         const time = Date.now() - startTime;
 
-        scene.copter1.position.x = 6 + 6 * Math.sin(time * 0.001);
-        scene.copter1.position.y = 6 + 4 * Math.cos(time * 0.000177);
-        scene.mat_copter.diffuseColor.r = scene.copter1.my_children[1].intersectsMesh(scene.ring1, true) ? 1 : 0;
+        Sim3.setRotationAxisAngleXYZ(sim,
+          0,
+          3.9,
+          0);
+        Sim3.translateXYZ(sim,
+          6,
+          5,
+          0.9
+        );
+        MeshHelper.applyTransform(scene.boxes1, sim);
+        MeshHelper.applyTransform(scene.m_tree2, sim);
+
+
+        //scene.copter1.position.x = 6 + 6 * Math.sin(time * 0.001);
+        //scene.copter1.position.y = 6 + 4 * Math.cos(time * 0.000177);
+
+
+        //scene.mat_copter.diffuseColor.r = scene.copter1.my_children[1].intersectsMesh(scene.ring1, true) ? 1 : 0;
+        scene.m_tree1.my_clear();
+        scene.m_tree2.my_clear();
+        collider._hit_coins = -1;//Math.floor(time * 0.001) % 12;
+        scene.mat_copter.diffuseColor.r = collider.collide(ring2_tree, DroneModel.boxTree, sim) ? 1 : 0;
+
+        scene.m_tree1.my_update();
+        scene.m_tree2.my_update();
+
 
         scene.scene.render();
     });

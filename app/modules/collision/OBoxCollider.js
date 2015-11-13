@@ -1,13 +1,13 @@
-import Vec3 from '/math/Sim3';
+import Vec3 from '/math/Vec3';
 import Sim3 from '/math/Sim3';
-import OBox from '/math/OBox';
+import OBox from '/math/solids/OBox';
 
-const {min} = Math;
+const {min, sqrt} = Math;
 
 function minBoundByDirXYZ(vertices, dx, dy, dz) {
   var res = Vec3.dotXYZ(vertices[0], dx, dy, dz);
   for (var i = 1; i < vertices.length; i++) {
-    var curr = dotXYZ(vertices[i], dx, dy, dz);
+    var curr = Vec3.dotXYZ(vertices[i], dx, dy, dz);
     res = min(res, curr);
   }
   return res;
@@ -62,7 +62,7 @@ export default class OBoxCollider {
     const temp1 = this._tempVec1;
     const temp2 = this._tempVec2;
     const transA = ba.transform;
-    const transB = ba.transform;
+    const transB = bb.transform;
     const verticesA = this._verticesA;
     const verticesB = this._verticesB;
 
@@ -80,23 +80,36 @@ export default class OBoxCollider {
     Sim3.getZ(temp1, transB);  aggregate();
 
     // Vec3.crossIP stores result in temp1
-    Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getX(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getY(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getX(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getY(temp2, transB)); aggregate();
-    Vec3.crossIP(Sim3.getZ(temp1, transA), Sim3.getZ(temp2, transB)); aggregate();
+    maybeAggregateCross(Sim3.getX(temp1, transA), Sim3.getX(temp2, transB));
+    maybeAggregateCross(Sim3.getX(temp1, transA), Sim3.getY(temp2, transB));
+    maybeAggregateCross(Sim3.getX(temp1, transA), Sim3.getZ(temp2, transB));
+    maybeAggregateCross(Sim3.getY(temp1, transA), Sim3.getX(temp2, transB));
+    maybeAggregateCross(Sim3.getY(temp1, transA), Sim3.getY(temp2, transB));
+    maybeAggregateCross(Sim3.getY(temp1, transA), Sim3.getZ(temp2, transB));
+    maybeAggregateCross(Sim3.getZ(temp1, transA), Sim3.getX(temp2, transB));
+    maybeAggregateCross(Sim3.getZ(temp1, transA), Sim3.getY(temp2, transB));
+    maybeAggregateCross(Sim3.getZ(temp1, transA), Sim3.getZ(temp2, transB));
 
     return minPenetration;
 
+    function maybeAggregateCross(ref_a, b) {
+      Vec3.crossIP(ref_a, b);
+      const l2 = Vec3.len2(ref_a);
+      if (l2 > 1e-5) {
+        Vec3.scaleIP(ref_a, 1 / sqrt(l2));
+        aggregate();
+      } else {
+        debugger;
+      }
+    }
     function distDir() {
       return maxBoundByDir(verticesA, temp1) - minBoundByDir(verticesB, temp1);
     }
     function aggregate() {
-      minPenetration = min(minPenetration, distDir());
+      const curr = distDir();
+      if (curr < minPenetration) {
+        minPenetration = curr;
+      }
     }
   }
 };

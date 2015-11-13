@@ -1,11 +1,8 @@
-import Sim3 from '/mat/Sim3';
-import Vec3 from '/mat/Vec3';
-
 export default class OBox {
   constructor() {
-    this._buffer = new Float32Array(16);
+    this._buffer = new Float32Array(15);
     this.hsize = this._buffer.subarray(0, 3);
-    this.transform = this._buffer.subarray(3, 16);
+    this.transform = this._buffer.subarray(3, 15);
   }
   volume() {
     return 8 * this.hsize[0] * this.hsize[1] * this.hsize[2];

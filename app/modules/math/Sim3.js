@@ -1,6 +1,6 @@
 import Vec3 from '/math/Vec3';
 
-const {sin, cos} = Math;
+const {sin, cos, abs} = Math;
 
 function create() {
   return new Float64Array(12);
@@ -63,6 +63,7 @@ function setRotationX(m, a) {
   m[9] =  0; m[10] =  0; m[11] =  0;
   return m;
 }
+
 function setRotationY(m, a) {
   const c = cos(a), s = sin(a);
   m[ 0] =  c; m[ 1] =  0; m[ 2] = -s;
@@ -80,35 +81,68 @@ function setRotationZ(m, a) {
   return m;
 }
 
-function setRotationEuler(m, v) {
-  return setRotationEulerScale(m, v, 1);
+function setRotationAxisAngle(m, v) {
+  return setRotationAxisAngleXYZ(m, v[0], v[1], v[2]);
 }
 
-function setRotationEulerScale(m, v, s) {
-  const l = Vec3.len(v);
-  // TODO: maybe rewrite to multiply by `il = 1/l` ?
-  const ux = v[0] / l;
-  const uy = v[1] / l;
-  const uz = v[2] / l;
+function setRotationAxisAngleScale(m, v, s) {
+  return setRotationAxisAngleXYZ(m, v[0] * s, v[1] * s, v[2] * s);
+}
 
-  const a = s * l;
-  const pcos = cos(a), psin = sin(a);
-  const ncos = 1 - pcos;
+function setRotationAxisAngleXYZ(m, vx, vy, vz) {
+  const a = Vec3.lenXYZ(vx, vy, vz);
+  if (-1e-4 < a && a < 1e-4) {
+    return setIdentity(m);
+  } else {
+    // TODO: maybe rewrite to multiply by `il = 1/l` ?
+    const ux = vx / a;
+    const uy = vy / a;
+    const uz = vz / a;
 
-  m[ 0] = pcos + ux * ux * ncos;
-  m[ 1] = ux * uy * ncos - uz * psin;
-  m[ 2] = ux * uz * ncos + uy * psin;
+    const psin = sin(a);
+    const pcos = cos(a);
+    const ncos = 1 - pcos;
 
-  m[ 3] = uy * ux * ncos + uz * psin;
-  m[ 4] = pcos + uy * uy * ncos;
-  m[ 5] = uy * uz * ncos - ux * psin;
+    m[0] = pcos + ux * ux * ncos;
+    m[1] = ux * uy * ncos - uz * psin;
+    m[2] = ux * uz * ncos + uy * psin;
 
-  m[ 6] = uz * ux * ncos - uy * psin;
-  m[ 7] = uz * uy * ncos + ux * psin;
-  m[ 8] = pcos + uz * uz * ncos;
+    m[3] = uy * ux * ncos + uz * psin;
+    m[4] = pcos + uy * uy * ncos;
+    m[5] = uy * uz * ncos - ux * psin;
 
-  m[ 9] =  0; m[10] =  0; m[11] =  0;
-  return m;
+    m[6] = uz * ux * ncos - uy * psin;
+    m[7] = uz * uy * ncos + ux * psin;
+    m[8] = pcos + uz * uz * ncos;
+
+    m[9] = 0;
+    m[10] = 0;
+    m[11] = 0;
+    return m;
+  }
+}
+
+
+function rotationX(a) {
+  return setRotationX(create(), a);
+}
+
+function rotationY(a) {
+  return setRotationY(create(), a);
+}
+
+function rotationZ(a) {
+  return setRotationZ(create(), a);
+}
+
+function rotationAxisAngle(v) {
+  return setRotationAxisAngle(create(), v);
+}
+function rotationAxisAngleScale(v) {
+  return setRotationAxisAngleScale(create(), v);
+}
+function rotationAxisAngleXYZ(x, y, z) {
+  return setRotationAxisAngleXYZ(create(), x, y, z);
 }
 
 function rotVecTo(to, v, s) {
@@ -279,8 +313,17 @@ export default {
   setRotationX,
   setRotationY,
   setRotationZ,
-  setRotationEuler,
-  setRotationEulerScale,
+  setRotationAxisAngle,
+  setRotationAxisAngleScale,
+  setRotationAxisAngleXYZ,
+
+  rotationX,
+  rotationY,
+  rotationZ,
+
+  rotationAxisAngle,
+  rotationAxisAngleScale,
+  rotationAxisAngleXYZ,
 
   transposeTo,
   invertTo,

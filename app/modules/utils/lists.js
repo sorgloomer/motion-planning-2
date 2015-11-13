@@ -25,17 +25,17 @@ function selectMax(list, selector, def = 0) {
 
 function aggregateBy(list, selector, aggregatePred, def) {
   if (list.length < 1) return def;
-  var value = list[0];
-  var score = selector(value);
+  var best_value = list[0];
+  var best_score = selector(best_value);
   for (var i = 1; i < list.length; i++) {
     var c_value = list[i];
     var c_score = selector(c_value);
-    if (aggregatePred(c_score, score)) {
-      score = c_score;
-      value = c_value;
+    if (aggregatePred(c_score, best_score)) {
+      best_score = c_score;
+      best_value = c_value;
     }
   }
-  return c_value;
+  return best_value;
 }
 
 function firstLarger(a, b) {

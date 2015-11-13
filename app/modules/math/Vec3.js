@@ -96,6 +96,13 @@ function len(a) {
   return sqrt(len2(a));
 }
 
+function len2XYZ(x, y, z) {
+  return x*x + y * y + z*z;
+}
+function lenXYZ(x, y, z) {
+  return sqrt(len2XYZ(x, y, z));
+}
+
 function dist2(a, b) {
   const d0 = a[0] - b[0];
   const d1 = a[1] - b[1];
@@ -198,6 +205,8 @@ export default {
   len2,
   dist,
   dist2,
+  lenXYZ,
+  len2XYZ,
 
   normalize,
   normalizeTo,

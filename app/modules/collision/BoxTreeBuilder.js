@@ -1,6 +1,7 @@
 import Vec3 from '/math/Vec3';
 import Sim3 from '/math/Sim3';
-import OBoxCollider from '/math/OBoxCollider';
+import OBox from '/math/solids/OBox';
+import OBoxCollider from '/collision/OBoxCollider';
 import lists from '/utils/lists';
 import BoxTreeNode from '/collision/BoxTreeNode';
 
@@ -24,7 +25,7 @@ function randomRot3(result = Sim3.create()) {
   var v1 = randomUnitVec3(temp_randomRot3[0]);
   var v2 = randomUnitVec3(temp_randomRot3[1]);
   var v3 = Vec3.crossTo(temp_randomRot3[2], v1, v2);
-  Vec3.crossTo(v2, v1, v3);
+  Vec3.crossTo(v2, v3, v1);
   Vec3.normalizeIP(v1);
   Vec3.normalizeIP(v2);
   Vec3.normalizeIP(v3);
@@ -37,8 +38,7 @@ export default class BoxTreeBuilder {
     this._box_collider = new OBoxCollider();
   }
 
-
-  function _calcEnclosingBox(boxes, rot) {
+  _calcEnclosingBox(boxes, rot) {
     var result = new OBox();
     var v = Vec3.create();
     const collider = this._box_collider;
@@ -65,7 +65,7 @@ export default class BoxTreeBuilder {
     return result;
   }
 
-  function _splitByRot(boxes, rot) {
+  _splitByRot(boxes, rot) {
     const dir = Sim3.getX(Vec3.create(), rot);
     const collider = this._box_collider;
     const sorted = lists.sortedBy(boxes, b => collider.maxBoxBoundByDir(b, dir));
@@ -83,7 +83,7 @@ export default class BoxTreeBuilder {
     return { parts: [list1, list2], bboxa, splitNegScore };
   }
 
-  function buildBoxTree(boxes) {
+  buildBoxTree(boxes) {
     if (boxes.length < 2) {
       return new BoxTreeNode(boxes[0], null);
     } else {
