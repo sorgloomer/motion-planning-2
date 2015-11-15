@@ -11,6 +11,9 @@ import DroneModel from '/experiment/drone/common/drone_boxes';
 import BoxTreeCollider from '/collision/BoxTreeCollider';
 import BoxTreeBuilder from '/collision/BoxTreeBuilder';
 
+import Piano3DConfig from '/experiment/piano3d/configuration';
+import Piano3DAction from '/experiment/piano3d/action';
+
 document.getElementById("main-area").addEventListener('click', () => {
 
 });
@@ -85,11 +88,6 @@ function createScene(oboxes, tree1) {
 
 
 
-    var ring1 = BABYLON.Mesh.CreateTorus('ring1', 7, 1, 32, scene);
-    ring1.material = ring_mat;
-    ring1.position = new BABYLON.Vector3(19, 5, 1);
-    ring1.rotation.x = PI/2;
-
 
     var platform_mat = new BABYLON.StandardMaterial("platform", scene);
     platform_mat.diffuseColor = new BABYLON.Color3(0.5, 1, 0.5);
@@ -114,7 +112,6 @@ function createScene(oboxes, tree1) {
     const ring2 = MeshHelper.meshFromOBoxList('ring2', scene, ring2_boxes, b => b.material = ring_mat && null);
 
     const shadowCasters = shadowGenerator.getShadowMap().renderList;
-    allObjects.push(ring1, platform);
     allObjects.push(...boxes1.my_children);
     allObjects.push(...ring2.my_children);
 
@@ -131,7 +128,7 @@ function createScene(oboxes, tree1) {
     */
     [ground].concat(allObjects).forEach(m => { m.receiveShadows = true; });
 
-    return { scene, mat_copter, ring1, ring2_boxes, boxes1, m_tree1, m_tree2 };
+    return { scene, mat_copter, ring2_boxes, boxes1, m_tree1, m_tree2 };
 }
 
 loaded(() => {
@@ -143,15 +140,25 @@ loaded(() => {
     const quat2 = Quat.create();
     const collider = new BoxTreeCollider();
 
+
     const startTime = Date.now();
+
+    var last_time = 0;
+    const my_action = Piano3DAction.randomize();
+    const my_config = Piano3DConfig.initial();
+    my_config[1] = 4;
+
     engine.runRenderLoop(() => {
         const time = Date.now() - startTime;
 
+        Piano3DAction.apply(my_config, my_action, my_config, 0.02);
 
-        Quat.setEulerXYZ(quat2, 0.3, 0, 0);
-        Quat.setEulerXYZ(quat, 0, 3.9 + 0.0007*time, 0);
-        Quat.mulTo(quat, quat, quat2);
-        QuatEtc.transformQXYZ(sim, quat, 6, 5, 0.9);
+        while (last_time < time) {
+            last_time += 1000;
+            Piano3DAction.randomize(my_action);
+        }
+
+        Piano3DConfig.to_sim(sim, my_config);
 
         MeshHelper.applyTransform(scene.boxes1, sim);
         MeshHelper.applyTransform(scene.m_tree2, sim);

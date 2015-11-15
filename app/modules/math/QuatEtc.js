@@ -107,5 +107,6 @@ export default {
   quat_to_sim,
   rot_to_quat,
 
+  setRandomUnit,
   transformQXYZ
 };
