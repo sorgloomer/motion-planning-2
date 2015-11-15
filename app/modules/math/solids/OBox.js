@@ -7,12 +7,12 @@ export default class OBox {
   volume() {
     return 8 * this.hsize[0] * this.hsize[1] * this.hsize[2];
   }
-  set(other) {
+  copy(other) {
     this._buffer.set(other._buffer, 0);
   }
   clone() {
     const r = new OBox();
-    r.set(this);
+    r.copy(this);
     return r;
   }
 }

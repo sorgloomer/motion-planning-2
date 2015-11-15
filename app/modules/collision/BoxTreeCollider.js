@@ -15,7 +15,7 @@ export default class BoxTreeCollider {
   }
   _node_penetration(node1, node2, sim) {
     const obox1 = node1.obox, obox2 = this._temp_obox;
-    obox2.set(node2.obox);
+    obox2.copy(node2.obox);
     Sim3.mulIP(obox2.transform, sim);
 
     const dist2 = Sim3Etc.getTDist2(obox1.transform, obox2.transform);

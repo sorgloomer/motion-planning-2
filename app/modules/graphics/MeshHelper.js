@@ -1,6 +1,23 @@
 import BABYLON from '/shim/babylon';
 import { quaternionSetSim } from '/graphics/Math';
 
+
+function applyQuaternion(mesh, q) {
+  const quat = mesh.rotationQuaternion || (mesh.rotationQuaternion = new BABYLON.Quaternion());
+  quat.w = q[0];
+  quat.x = q[1];
+  quat.y = q[2];
+  quat.z = q[3];
+  return mesh;
+}
+function applyTranslation(mesh, v) {
+  const pos = mesh.position;
+  pos.x = v[0];
+  pos.y = v[1];
+  pos.z = v[2];
+  return mesh;
+}
+
 function applyTransform(mesh, sim) {
   const pos = mesh.position;
   pos.x = sim[9];
@@ -73,6 +90,8 @@ function meshFromOBoxTree(name, scene, treeRoot, renderLeaves = false, node_cb =
 }
 
 export default {
+  applyQuaternion,
+  applyTranslation,
   applyTransform,
   meshFromOBoxList,
   meshFromOBoxTree

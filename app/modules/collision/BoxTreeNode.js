@@ -19,7 +19,7 @@ export default class BoxTreeNode {
   }
 
   set(node) {
-    this.obox.set(node.obox);
+    this.obox.copy(node.obox);
     this.volume = node.volume;
     this.radius = node.radius;
     this.children = node.children;

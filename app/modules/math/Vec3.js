@@ -18,10 +18,6 @@ function setXYZ(to, x, y, z) {
   return to;
 }
 
-function set(to, a) {
-  return setXYZ(to, a[0], a[1], a[2]);
-}
-
 function addTo(to, a, b) {
   to[0] = a[0] + b[0];
   to[1] = a[1] + b[1];
@@ -170,7 +166,7 @@ export default {
   DIMS: 3,
   create,
   array,
-  set,
+
   setXYZ,
   unit,
   unitSet,

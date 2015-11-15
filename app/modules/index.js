@@ -2,6 +2,8 @@ import BABYLON from '/shim/babylon';
 import loaded from '/utils/loaded';
 import { DEG_TO_RAD, PI } from '/utils/math';
 import Sim3 from '/math/Sim3';
+import Quat from '/math/Quat';
+import QuatEtc from '/math/QuatEtc';
 import MeshHelper from '/graphics/MeshHelper';
 import DefinitionHelper from '/experiment/common/DefinitionHelper';
 
@@ -31,56 +33,6 @@ function buildCopterMaterial(name, scene) {
     return mat;
 }
 
-function buildCopter(name, material, scene) {
-
-    var pivot = new BABYLON.Mesh(name, scene);
-    var body = BABYLON.Mesh.CreateBox(name + "__body", { width: 1, depth: 1, height: 0.3 }, scene);
-    const hbody = 0.15;
-    body.parent = pivot;
-    body.position.y = hbody;
-
-    var cross1 = BABYLON.Mesh.CreateBox(name + "__cross1", { width: 4, depth: 0.2, height: 0.05 }, scene);
-    cross1.parent = body;
-    cross1.rotation.y = PI / 4;
-    cross1.position.y = hbody;
-
-    var cross2 = BABYLON.Mesh.CreateBox(name + "__cross2", { width: 4, depth: 0.2, height: 0.05 }, scene);
-    cross2.parent = body;
-    cross2.rotation.y = -PI / 4;
-    cross2.position.y = hbody;
-
-    var prop1 = BABYLON.Mesh.CreateBox(name + '__prop1', { width: 1, depth: 1, height: 0.04 }, scene);
-    prop1.parent = body;
-    prop1.position.x = 1.4;
-    prop1.position.z = 1.4;
-    prop1.position.y = 0.045 + hbody;
-
-    var prop2 = BABYLON.Mesh.CreateBox(name + '__prop2', { width: 1, depth: 1, height: 0.04 }, scene);
-    prop2.parent = body;
-    prop2.position.x = -1.4;
-    prop2.position.z = 1.4;
-    prop2.position.y = 0.045 + hbody;
-
-    var prop3 = BABYLON.Mesh.CreateBox(name + '__prop3', { width: 1, depth: 1, height: 0.04 }, scene);
-    prop3.parent = body;
-    prop3.position.x = 1.4;
-    prop3.position.z = -1.4;
-    prop3.position.y = 0.045 + hbody;
-
-    var prop4 = BABYLON.Mesh.CreateBox(name + '__prop4', { width: 1, depth: 1, height: 0.04 }, scene);
-    prop4.parent = body;
-    prop4.position.x = -1.4;
-    prop4.position.z = -1.4;
-    prop4.position.y = 0.045 + hbody;
-
-    const children = [body, cross1, cross2, prop1, prop2, prop3, prop4];
-    children.forEach(c => { c.material = material; });
-    pivot.my_children = children;
-
-
-    return pivot;
-}
-
 function pushAll(arr, items) {
     arr.push(...items);
 }
@@ -105,8 +57,6 @@ function createScene(oboxes, tree1) {
     light_sphere.groundColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 
     var mat_copter = buildCopterMaterial('mat_copter', scene);
-    var copter1 = buildCopter('copter1', mat_copter, scene);
-    copter1.position.y = 0.8;
 
     var boxes1 = MeshHelper.meshFromOBoxList('boxes1', scene, oboxes, m => m.material = mat_copter);
 
@@ -162,13 +112,11 @@ function createScene(oboxes, tree1) {
 
 
     const ring2 = MeshHelper.meshFromOBoxList('ring2', scene, ring2_boxes, b => b.material = ring_mat && null);
-    allObjects.push(ring2);
-
 
     const shadowCasters = shadowGenerator.getShadowMap().renderList;
     allObjects.push(ring1, platform);
-    allObjects.push(...copter1.my_children);
     allObjects.push(...boxes1.my_children);
+    allObjects.push(...ring2.my_children);
 
     pushAll(shadowCasters, allObjects);
 
@@ -183,7 +131,7 @@ function createScene(oboxes, tree1) {
     */
     [ground].concat(allObjects).forEach(m => { m.receiveShadows = true; });
 
-    return { scene, copter1, mat_copter, ring1, ring2_boxes, boxes1, m_tree1, m_tree2 };
+    return { scene, mat_copter, ring1, ring2_boxes, boxes1, m_tree1, m_tree2 };
 }
 
 loaded(() => {
@@ -191,30 +139,23 @@ loaded(() => {
 
     const scene = createScene(DroneModel.boxList, DroneModel.boxTree);
     const sim = Sim3.create();
+    const quat = Quat.create();
+    const quat2 = Quat.create();
     const collider = new BoxTreeCollider();
 
     const startTime = Date.now();
     engine.runRenderLoop(() => {
         const time = Date.now() - startTime;
 
-        Sim3.setRotationAxisAngleXYZ(sim,
-          0,
-          3.9 + 0.0007*time,
-          0);
-        Sim3.translateXYZ(sim,
-          6,
-          5,
-          0.9
-        );
+
+        Quat.setEulerXYZ(quat2, 0.3, 0, 0);
+        Quat.setEulerXYZ(quat, 0, 3.9 + 0.0007*time, 0);
+        Quat.mulTo(quat, quat, quat2);
+        QuatEtc.transformQXYZ(sim, quat, 6, 5, 0.9);
+
         MeshHelper.applyTransform(scene.boxes1, sim);
         MeshHelper.applyTransform(scene.m_tree2, sim);
 
-
-        //scene.copter1.position.x = 6 + 6 * Math.sin(time * 0.001);
-        //scene.copter1.position.y = 6 + 4 * Math.cos(time * 0.000177);
-
-
-        //scene.mat_copter.diffuseColor.r = scene.copter1.my_children[1].intersectsMesh(scene.ring1, true) ? 1 : 0;
         scene.m_tree1.my_clear();
         scene.m_tree2.my_clear();
         collider._hit_coins = -1;//Math.floor(time * 0.001) % 12;
