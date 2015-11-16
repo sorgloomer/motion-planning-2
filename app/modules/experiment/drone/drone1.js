@@ -11,9 +11,9 @@ export default function DroneRingMap() {
   this.agentBoxes = DroneBoxes.boxList;
   this.worldBoxes =
     []
-      .concat(DefinitionHelper.makeRing(3.5, 1, 16, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0, +2)))
-      .concat(DefinitionHelper.makeRing(3.0, 1, 16, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0,  0)))
-      .concat(DefinitionHelper.makeRing(3.5, 1, 16, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0, -2)))
+      .concat(DefinitionHelper.makeRing(3.5, 0.7, 16, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0, +2)))
+      .concat(DefinitionHelper.makeRing(3.0, 0.7, 12, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0,  0)))
+      .concat(DefinitionHelper.makeRing(3.5, 0.7, 16, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0, -2)))
   ;
 
   this.sampler = Sampler(this.agentBoxes, this.worldBoxes);

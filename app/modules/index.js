@@ -62,7 +62,7 @@ function createScene(worldBoxes, agentBoxes) {
 
     var mesh_agent = MeshHelper.meshFromOBoxList('agent', scene, agentBoxes, m => m.material = mat_agent);
 
-    /*
+
     // Skybox
     var skybox = BABYLON.Mesh.CreateBox("skyBox", 500.0, scene);
     var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
@@ -74,7 +74,7 @@ function createScene(worldBoxes, agentBoxes) {
     skyboxMaterial.disableLighting = true;
     skybox.infiniteDistance = true;
     skybox.material = skyboxMaterial;
-    */
+
 
     var ring_mat = new BABYLON.StandardMaterial("walls", scene);
     ring_mat.diffuseColor = new BABYLON.Color3(1, 0.2, 0.2);
