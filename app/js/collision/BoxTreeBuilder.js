@@ -51,7 +51,7 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
       var dir = separated[2];
       var node1 = BoxTree.wrap(separated[0], dir);
       var node2 = BoxTree.wrap(separated[1], dir);
-      var score = -OBox.penetration(node1.box, node2.box);
+      var score = -Obb.penetration(node1.box, node2.box);
       return {
         score: score,
         node1: node1,
@@ -65,7 +65,7 @@ var BoxTreeBuilder = (function(Math, vec2, similar2, BoxTree) {
 
     var allLeaves = list.map(function(item) {
       var res = new BoxTree();
-      OBox.set(res.box, item);
+      Obb.set(res.box, item);
       res.process();
       return res;
     });

@@ -1,6 +1,6 @@
 import Vec3 from '/math/Vec3';
 import Sim3 from '/math/Sim3';
-import OBox from '/math/solids/OBox';
+import OBox from '/collision/obb/Obb';
 
 const {min, sqrt} = Math;
 

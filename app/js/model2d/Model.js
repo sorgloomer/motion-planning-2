@@ -1,7 +1,7 @@
 var Model = (function(utils, similar2, BoxTreeBuilder) {
 
   function defToOBox(def) {
-    return OBox.create(def.size[0], def.size[1], def.pos[0], def.pos[1], def.angle);
+    return Obb.create(def.size[0], def.size[1], def.pos[0], def.pos[1], def.angle);
   }
 
   function Agent(def) {

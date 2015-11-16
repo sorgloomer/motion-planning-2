@@ -1,4 +1,4 @@
-export default class OBox {
+export default class Obb {
   constructor() {
     this._buffer = new Float32Array(15);
     this.hsize = this._buffer.subarray(0, 3);
@@ -11,7 +11,7 @@ export default class OBox {
     this._buffer.set(other._buffer, 0);
   }
   clone() {
-    const r = new OBox();
+    const r = new Obb();
     r.copy(this);
     return r;
   }

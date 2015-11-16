@@ -1,38 +1,22 @@
+import VecN from '/math/VecN';
 
-define('math.NBoxTree', [ 'math.vec' ], function(vec) {
-  function Node(nbox) {
+function newNode(nbox) {
+  return new Node(nbox);
+}
+function putChild(dot, ch, depth, maxcnt) {
+  return ch.some(c => c.putDot(dot, depth, maxcnt));
+}
+
+export class Node {
+  constructor(nbox) {
     this.nbox = nbox;
     this.ch = null;
     this.dots = [];
   }
-
-  function NBoxTree(nbox) {
-    this.root = new Node(nbox);
-    this.maxcnt = 3;
-    this.count = 0;
-    this._measurement = 0;
-    this._measurementBox = 0;
-  }
-
-  NBoxTree.Node = Node;
-
-  var NodeProto = Node.prototype;
-  var NBoxTreeProto = NBoxTree.prototype;
-
-  NodeProto.isLeaf = function () {
+  isLeaf() {
     return !this.ch;
-  };
-  function newNode(nbox) {
-    return new Node(nbox);
   }
-
-  function putChild(dot, ch, depth, maxcnt) {
-    return ch.some(function (c) {
-      return c.putDot(dot, depth, maxcnt);
-    });
-  }
-
-  NodeProto.putDot = function (dot, depth, maxcnt) {
+  putDot(dot, depth, maxcnt) {
     var ch = this.ch;
     if (this.nbox.contains(dot)) {
       if (!ch && this.dots.length > maxcnt) {
@@ -47,19 +31,28 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     } else {
       return false;
     }
-  };
-
-  NodeProto.split = function (depth) {
+  }
+  split(depth) {
     var ch = this.ch = this.nbox.split2().map(newNode);
     this.dots.forEach(function (dot) {
       putChild(dot, ch, depth);
     });
     this.dots = null;
     return ch;
-  };
+  }
+};
 
 
-  NBoxTreeProto.traverse = function (fn, ctx) {
+export default class NBoxTree {
+  constructor(nbox) {
+    this.root = new Node(nbox);
+    this.maxcnt = 3;
+    this.count = 0;
+    this._measurement = 0;
+    this._measurementBox = 0;
+  }
+
+  traverse(fn, ctx) {
     var depth = 0;
 
     function bound(node) {
@@ -74,9 +67,9 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     }
 
     bound(this.root);
-  };
+  }
 
-  NBoxTreeProto.inspect = function() {
+  inspect() {
     var maxdepth = 0;
     var dotcount = 0;
     var depth = 0;
@@ -96,15 +89,9 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     bound(this.root);
     console.log(" " + dotcount + "\t-\t" + maxdepth);
 
-  };
-
-  function foreach(arr, fn) {
-    for (var i = 0; i < arr.length; i++) {
-      fn(arr[i]);
-    }
   }
 
-  NBoxTreeProto.nearest = function (dot) {
+  nearest(dot) {
     var currentBest = null;
     var currentRadius2 = 0;
 
@@ -112,7 +99,7 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
 
     function visit(savedDot) {
       visitCnt++;
-      var dist2 = vec.dist2(savedDot, dot);
+      var dist2 = VecN.dist2(savedDot, dot);
       if (currentBest === null || dist2 < currentRadius2) {
         currentBest = savedDot;
         currentRadius2 = dist2;
@@ -136,11 +123,11 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
       boxCnt++;
       var ch = node.ch, dots = node.dots;
       if (ch) {
-        foreach(ch, intrav);
-        foreach(ch, outtrav);
+        ch.forEach(intrav);
+        ch.forEach(outtrav);
       }
       if (dots) {
-        foreach(dots, visit);
+        dots.forEach(visit);
       }
     }
 
@@ -148,9 +135,9 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     this._measurement = visitCnt;
     this._measurementBox = boxCnt;
     return currentBest;
-  };
+  }
 
-  NBoxTreeProto.hasInRange = function (p, dist) {
+  hasInRange(p, dist) {
     var dist2 = dist * dist;
     var result = false;
 
@@ -175,9 +162,9 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
 
     bound(this.root);
     return result;
-  };
+  }
 
-  NBoxTreeProto.enumerateInRange = function (p, maxDist, fn, ctx) {
+  enumerateInRange(p, maxDist, fn, ctx) {
     var maxDist2 = maxDist * maxDist;
 
     function visit(dot) {
@@ -201,14 +188,12 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     }
 
     bound(this.root);
-  };
+  }
 
-  NBoxTreeProto.putDot = function (dot) {
+  putDot(dot) {
     this.count++;
     var success = this.root.putDot(dot, 0, this.maxcnt);
     if (!success) throw new Error("NBoxTree.putDot: outside");
     return true;
-  };
-
-  return NBoxTree;
-});
+  }
+};

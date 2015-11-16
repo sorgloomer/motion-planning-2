@@ -87,4 +87,4 @@ var BoxTree = (function(Math, OBox, vec2, similar2) {
   BoxTree.prototype.collides = function(node2, node2sim) { return collides(this, node2, node2sim); };
 
   return BoxTree;
-})(Math, OBox, vec2, similar2);
+})(Math, Obb, vec2, similar2);

@@ -1,5 +1,5 @@
 import { OBox_makePlacement as box } from '/experiment/common/DefinitionHelper';
-import BoxTreeBuilder from '/collision/BoxTreeBuilder';
+import BoxTreeBuilder from '/collision/obb/ObbTreeBuilder';
 import lists from '/utils/lists';
 
 const boxList = [

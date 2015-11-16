@@ -7,12 +7,15 @@ import QuatEtc from '/math/QuatEtc';
 import MeshHelper from '/graphics/MeshHelper';
 import DefinitionHelper from '/experiment/common/DefinitionHelper';
 
-import DroneModel from '/experiment/drone/common/drone_boxes';
-import BoxTreeCollider from '/collision/BoxTreeCollider';
-import BoxTreeBuilder from '/collision/BoxTreeBuilder';
+import DroneModel from '/experiment/drone/drone_boxes';
+import BoxTreeCollider from '/collision/obb/ObbTreeCollider';
+import BoxTreeBuilder from '/collision/obb/ObbTreeBuilder';
 
 import Piano3DConfig from '/experiment/piano3d/configuration';
 import Piano3DAction from '/experiment/piano3d/action';
+
+import RrtVoronoi from '/planning/algorithm/RrtVoronoi';
+import Drone1 from '/experiment/drone/drone1';
 
 document.getElementById("main-area").addEventListener('click', () => {
 
@@ -28,7 +31,6 @@ const ring2_boxes = DefinitionHelper.makeRing(
 const ring2_tree = (new BoxTreeBuilder()).buildBoxTree(ring2_boxes);
 
 
-
 function buildCopterMaterial(name, scene) {
     var mat = new BABYLON.StandardMaterial(name, scene);
     mat.diffuseColor = new BABYLON.Color3(0.6, 0.6, 0.6);
@@ -36,13 +38,10 @@ function buildCopterMaterial(name, scene) {
     return mat;
 }
 
-function pushAll(arr, items) {
-    arr.push(...items);
-}
-function createScene(oboxes, tree1) {
+function createScene(worldBoxes, agentBoxes) {
     var scene = new BABYLON.Scene(engine);
     scene.clearColor = new BABYLON.Color3(0.7, 0.9, 1);
-    var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 2, -4), scene);
+    var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 4, -8), scene);
     camera.speed = 0.4;
     camera.minZ = 1;
     camera.maxZ = 1000;
@@ -59,9 +58,9 @@ function createScene(oboxes, tree1) {
     light_sphere.specular = new BABYLON.Color3(0, 0, 0);
     light_sphere.groundColor = new BABYLON.Color3(0.5, 0.5, 0.5);
 
-    var mat_copter = buildCopterMaterial('mat_copter', scene);
+    var mat_agent = buildCopterMaterial('mat_agent', scene);
 
-    var boxes1 = MeshHelper.meshFromOBoxList('boxes1', scene, oboxes, m => m.material = mat_copter);
+    var mesh_agent = MeshHelper.meshFromOBoxList('agent', scene, agentBoxes, m => m.material = mat_agent);
 
     /*
     // Skybox
@@ -87,91 +86,79 @@ function createScene(oboxes, tree1) {
     mat_wireframe.wireframe = true;
 
 
+    var mat_world = new BABYLON.StandardMaterial("mat_world", scene);
+    mat_world.diffuseColor = new BABYLON.Color3(1, 1, 1);
+    mat_world.specularColor = new BABYLON.Color3(0, 0, 0);
 
 
-    var platform_mat = new BABYLON.StandardMaterial("platform", scene);
-    platform_mat.diffuseColor = new BABYLON.Color3(0.5, 1, 0.5);
-    platform_mat.specularColor = new BABYLON.Color3(0, 0, 0);
-    var platform = BABYLON.Mesh.CreateBox("platform", { width: 4, depth: 4, height: 1 }, scene);
-    platform.material = platform_mat;
-
-    var walls_mat = new BABYLON.StandardMaterial("walls", scene);
-    walls_mat.diffuseColor = new BABYLON.Color3(1, 1, 1);
-    walls_mat.specularColor = new BABYLON.Color3(0, 0, 0);
-
-
-    var ground = BABYLON.Mesh.CreateGround("ground1", 30, 30, 2, scene);
-    ground.material = walls_mat;
+    var ground = BABYLON.Mesh.CreateGround("ground", 30, 30, 2, scene);
+    ground.position.y = -5;
+    ground.material = mat_world;
 
     var shadowGenerator = new BABYLON.ShadowGenerator(1024, light_dir);
     shadowGenerator.usePoissonSampling = true;
 
     const allObjects = [];
 
-
-    const ring2 = MeshHelper.meshFromOBoxList('ring2', scene, ring2_boxes, b => b.material = ring_mat && null);
+    const mesh_world = MeshHelper.meshFromOBoxList('world', scene, worldBoxes, b => b.material = ring_mat && null);
 
     const shadowCasters = shadowGenerator.getShadowMap().renderList;
-    allObjects.push(...boxes1.my_children);
-    allObjects.push(...ring2.my_children);
+    allObjects.push(...mesh_agent.my_children);
+    allObjects.push(...mesh_world.my_children);
 
-    pushAll(shadowCasters, allObjects);
-
-
-    const m_tree1 = MeshHelper.meshFromOBoxTree('m_tree1', scene, ring2_tree, true, (mesh, node) => mesh.material = mat_wireframe);
-    const m_tree2 = MeshHelper.meshFromOBoxTree('m_tree2', scene, tree1, true, (mesh, node) => mesh.material = mat_wireframe);
+    shadowCasters.push(...allObjects);
 
 
     /*
-    boxes1.position.y = 4;
-    m_tree1.position.y = 4;
+    const tree_agent = MeshHelper.meshFromOBoxTree('tree_agent', scene, ring2_tree, true, (mesh, node) => mesh.material = mat_wireframe);
+    const tree_world = MeshHelper.meshFromOBoxTree('tree_world', scene, tree1, true, (mesh, node) => mesh.material = mat_wireframe);
     */
+
     [ground].concat(allObjects).forEach(m => { m.receiveShadows = true; });
 
-    return { scene, mat_copter, ring2_boxes, boxes1, m_tree1, m_tree2 };
+    return { scene, mat_agent, mesh_world, mesh_agent };
 }
 
 loaded(() => {
 
 
-    const scene = createScene(DroneModel.boxList, DroneModel.boxTree);
-    const sim = Sim3.create();
-    const quat = Quat.create();
-    const quat2 = Quat.create();
-    const collider = new BoxTreeCollider();
 
+    const experiment = new Drone1();
+    const scene = createScene(experiment.worldBoxes, experiment.agentBoxes);
+    const solver = new RrtVoronoi(experiment);
+
+
+    const sim = Sim3.create();
+    const conf = Piano3DConfig.create();
 
     const startTime = Date.now();
-
     var last_time = 0;
-    const my_action = Piano3DAction.randomize();
-    const my_config = Piano3DConfig.initial();
-    my_config[1] = 4;
+    var solution = null;
 
+    const TIME_KEYFRAME = 400;
     engine.runRenderLoop(() => {
         const time = Date.now() - startTime;
 
-        Piano3DAction.apply(my_config, my_action, my_config, 0.02);
+        if (solver.hasSolution) {
+            if (solution) {
+                const numb = time / TIME_KEYFRAME;
+                const integ = Math.floor(numb);
+                const frac = numb - integ;
+                const index = integ % (solution.path.length - 1);
+                Piano3DConfig.lerp(solution.path[index], solution.path[index + 1], frac, conf);
+                Piano3DConfig.to_sim(sim, conf);
+                MeshHelper.applyTransform(scene.mesh_agent, sim);
+            } else {
+                solution = solver.getSolution();
+            }
+        } else {
+            solver.iterate(30);
 
-        while (last_time < time) {
-            last_time += 1000;
-            Piano3DAction.randomize(my_action);
+            if (solver.lastPut) {
+                Piano3DConfig.to_sim(sim, solver.lastPut);
+                MeshHelper.applyTransform(scene.mesh_agent, sim);
+            }
         }
-
-        Piano3DConfig.to_sim(sim, my_config);
-
-        MeshHelper.applyTransform(scene.boxes1, sim);
-        MeshHelper.applyTransform(scene.m_tree2, sim);
-
-        scene.m_tree1.my_clear();
-        scene.m_tree2.my_clear();
-        collider._hit_coins = -1;//Math.floor(time * 0.001) % 12;
-        scene.mat_copter.diffuseColor.r = collider.collide(ring2_tree, DroneModel.boxTree, sim) ? 1 : 0;
-
-        scene.m_tree1.my_update();
-        scene.m_tree2.my_update();
-
-
         scene.scene.render();
     });
 });

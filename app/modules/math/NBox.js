@@ -1,37 +1,50 @@
-/**
- * Created by Hege on 2014.09.28..
- */
+import VecN from '/math/VecN';
 
-define('math.NBox', ['math.vec'], function(vec) {
-  function NBox(min, max) {
+const {sqrt} = Math;
+
+function copyarr(a) {
+  return a.slice(0);
+}
+
+function clamp(x, mi, ma) {
+  if (x < mi) return mi;
+  if (x > ma) return ma;
+  return x;
+}
+
+export default class NBox {
+  constructor(min, max) {
     this.min = min;
     this.max = max;
   }
 
-  var Proto = NBox.prototype;
-  Proto.contains = function (dot) {
+  contains(dot) {
     var min = this.min, max = this.max;
     for (var i = 0; i < min.length; i++) {
       var x = dot[i];
       if (x < min[i] || x > max[i]) return false;
     }
     return true;
-  };
-  Proto.width = function (dim) {
+  }
+
+  width(dim) {
     return this.max[dim] - this.min[dim];
-  };
-  Proto.split = function (dim) {
+  }
+
+
+  split(dim) {
     var min = this.min, max = this.max;
-    var minmid = vec.copy(min);
-    var maxmid = vec.copy(max);
+    var minmid = VecN.copy(min);
+    var maxmid = VecN.copy(max);
     var mid = (min[dim] + max[dim]) * 0.5;
     minmid[dim] = maxmid[dim] = mid;
     return [
       new NBox(min, maxmid),
       new NBox(minmid, max)
     ];
-  };
-  Proto.split2 = function () {
+  }
+
+  split2() {
     var bd = 0, bv = this.width(0);
     var dims = this.dims();
     for (var i = 1; i < dims; i++) {
@@ -42,15 +55,17 @@ define('math.NBox', ['math.vec'], function(vec) {
       }
     }
     return this.split(bd);
-  };
-  Proto.size = function () {
-    return vec.sub(this.max, this.min);
-  };
-  Proto.sizeTo = function (to) {
-    return vec.subTo(to, this.max, this.min);
-  };
+  }
 
-  Proto.dist2 = function (p) {
+  size() {
+    return VecN.sub(this.max, this.min);
+  }
+
+  sizeTo(to) {
+    return VecN.subTo(to, this.max, this.min);
+  }
+
+  dist2(p) {
     var min = this.min, max = this.max;
     var coord, delta, result = 0;
     for (var i = 0, mi = p.length; i < mi; i++) {
@@ -59,14 +74,15 @@ define('math.NBox', ['math.vec'], function(vec) {
       result += delta * delta;
     }
     return result;
-  };
-  Proto.dist = function (p) {
-    return Math.sqrt(this.dist2(p));
-  };
-  Proto.dims = function () {
+  }
+  dist(p) {
+    return sqrt(this.dist2(p));
+  }
+  dims() {
     return this.min.length;
-  };
-  Proto.fatten = function (ratio) {
+  }
+
+  fatten(ratio) {
     if (ratio === undefined) ratio = 0.25;
     var size = this.size();
     var i;
@@ -77,18 +93,10 @@ define('math.NBox', ['math.vec'], function(vec) {
       nmax[i] += size[i] * ratio;
     }
     return new NBox(nmin, nmax);
-  };
-  function copyarr(a) {
-    return a.slice(0);
   }
-
-  function clamp(x, mi, ma) {
-    if (x < mi) return mi;
-    if (x > ma) return ma;
-    return x;
+  static make(min, max) {
+    return new NBox(VecN.make(min), VecN.make(max));
   }
-  return NBox;
-});
-
+};
 
 

@@ -1,5 +1,5 @@
 import Vec3 from '/math/Vec3';
-import OBox from '/math/solids/OBox';
+import OBox from '/collision/obb/Obb';
 
 export default class BoxTreeNode {
   constructor(obox = null, children = null) {

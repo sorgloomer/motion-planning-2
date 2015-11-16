@@ -1,13 +1,10 @@
-/**
- * Created by Hege on 2014.09.28..
- */
+const {sqrt} = Math;
 
-define('math.vec', [], function() {
   function dims(a) {
     return a.length;
   }
 
-  function set(to, a) {
+  function copyTo(to, a) {
     for (var i = 0; i < to.length; i++) {
       to[i] = a[i];
     }
@@ -21,8 +18,7 @@ define('math.vec', [], function() {
   }
 
   function add(a, b) {
-    var r = alloc(a.length);
-    return addTo(r, r, b);
+    return addTo(_alloc(a), a, b);
   }
 
   function subTo(to, a, b) {
@@ -33,8 +29,7 @@ define('math.vec', [], function() {
   }
 
   function sub(a, b) {
-    var r = alloc(a.length);
-    return subTo(r, a, b);
+    return subTo(_alloc(a), a, b);
   }
 
   function lerpTo(to, a, b, t) {
@@ -53,16 +48,14 @@ define('math.vec', [], function() {
     return res;
   }
 
-  function scale(v, s, outp) {
-    if (outp) {
-      copyTo(outp, v)
-    } else {
-      outp = copy(v);
+  function scaleTo(to, v, s) {
+    for (var i = 0; i < v.length; i++) {
+      to[i] = v[i] * s;
     }
-    for (var i = 0, mi = outp.length; i < mi; i++) {
-      outp[i] *= s;
-    }
-    return outp;
+    return to;
+  }
+  function scale(v, s) {
+    return scaleTo(_alloc(v), v, s);
   }
 
   function len2(a) {
@@ -74,7 +67,7 @@ define('math.vec', [], function() {
   }
 
   function len(a) {
-    return Math.sqrt(len2(a));
+    return sqrt(len2(a));
   }
 
   function dist2(a, b) {
@@ -87,25 +80,15 @@ define('math.vec', [], function() {
   }
 
   function dist(a, b) {
-    return Math.sqrt(dist2(a, b));
+    return sqrt(dist2(a, b));
   }
 
   function copy(a) {
     return new Float64Array(a);
   }
 
-  function copyTo(b, a) {
-    for (var i = 0, mi = a.length; i < mi; i++) {
-      b[i] = a[i];
-    }
-    b.length = a.length;
-    return b;
-  }
-
   function zero(dims) {
-    var res = alloc(dims);
-    for (var i = 0; i < dims; i++) res[i] = 0;
-    return res;
+    return alloc(dims);
   }
 
   function unit(dims, dir) {
@@ -117,28 +100,39 @@ define('math.vec', [], function() {
   function alloc(dims) {
     return new Float64Array(dims);
   }
+  function _alloc(other) {
+    return new Float64Array(other.length);
+  }
 
-  return {
-    alloc: alloc,
-    zero: zero,
-    unit: unit,
-    dims: dims,
-    set: set,
+function V(...args) {
+  return new Float64Array(args);
+}
+function make(args) {
+  return new Float64Array(args);
+}
 
-    copy: copy,
-    copyTo: copyTo,
+  export default {
+    V,
+    make,
+    alloc,
+    zero,
+    unit,
+    dims,
 
-    scale: scale,
-    lerpTo: lerpTo,
+    copy,
+    copyTo,
 
-    dot: dot,
-    add: add,
-    addTo: addTo,
-    sub: sub,
-    subTo: subTo,
-    len: len,
-    len2: len2,
-    dist: dist,
-    dist2: dist2
+    scaleTo,
+    scale,
+    lerpTo,
+
+    dot,
+    add,
+    addTo,
+    sub,
+    subTo,
+    len,
+    len2,
+    dist,
+    dist2
   };
-});

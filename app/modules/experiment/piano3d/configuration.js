@@ -38,9 +38,12 @@ function randomize(config, nbox) {
   return config;
 }
 
-function copy(a, to = create()) {
+function copyTo(to, a) {
   to.set(a, 0);
   return to;
+}
+function copy(a) {
+  return copyTo(create(), a);
 }
 
 function dist(a, b) {
@@ -64,7 +67,7 @@ function lerp(a, b, t, to = create()) {
   to[2] = a[2] * it + b[2] * t;
   _load_quat(a, temp_quat);
   _load_quat(b, temp_quat2);
-  Quat.slerpIP(temp_quat, t);
+  Quat.slerpIP(temp_quat, temp_quat2, t);
   _store_quat(to, temp_quat);
   return to;
 }
@@ -86,6 +89,20 @@ function to_sim(sim, conf) {
   return sim;
 }
 
+function make(tx, ty, tz, qw, qx, qy, qz) {
+  var r = create();
+  r[0] = tx;
+  r[1] = ty;
+  r[2] = tz;
+  r[3] = qw;
+  r[4] = qx;
+  r[5] = qy;
+  r[6] = qz;
+  return r;
+}
+
 export default {
-  initial, create, randomize, copy, dist, lerp, to_sim
+  initial, create, randomize,
+  copy, copyTo,
+  dist, lerp, to_sim, make
 };

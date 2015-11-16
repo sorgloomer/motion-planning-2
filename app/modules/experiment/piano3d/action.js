@@ -48,7 +48,7 @@ function randomize(c = create()) {
 }
 
 
-function apply(config, action, dest, dt = 0.05) {
+function applyTo(dest, config, action, dt = 0.3) {
   dest[0] = config[0] + action[0] * dt * 3;
   dest[1] = config[1] + action[1] * dt * 3;
   dest[2] = config[2] + action[2] * dt * 3;
@@ -59,7 +59,10 @@ function apply(config, action, dest, dt = 0.05) {
   _store_quat(dest, 3, temp_quat1);
   return dest;
 }
+function applyIP(config, action, opt_dt) {
+  return applyTo(config, config, action, opt_dt);
+}
 
 export default {
-  create, randomize, apply
+  create, randomize, applyTo, applyIP
 };

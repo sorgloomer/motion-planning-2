@@ -1,10 +1,10 @@
-import OBox from '/math/solids/OBox';
-import BoxTreeBuilder from '/collision/BoxTreeBuilder';
+import OBox from '/collision/obb/Obb';
+import BoxTreeBuilder from '/collision/obb/ObbTreeBuilder';
 import lists from '/utils/lists';
 
 
 /*
-const boxList = lists.generate(8, i => OBox.makePlacement(
+const boxList = lists.generate(8, i => Obb.makePlacement(
   0.5, 0.5, 0.5, 0, 3 * i, 0, 0, 0, 0, 0
 ));
 */
