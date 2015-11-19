@@ -59,6 +59,7 @@ function applyTo(dest, config, action, dt = 0.3) {
   _store_quat(dest, 3, temp_quat1);
   return dest;
 }
+
 function applyIP(config, action, opt_dt) {
   return applyTo(config, config, action, opt_dt);
 }

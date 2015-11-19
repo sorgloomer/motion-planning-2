@@ -46,7 +46,7 @@ function copy(a) {
   return copyTo(create(), a);
 }
 
-function dist(a, b) {
+function dist2(a, b) {
   const x0 = b[0] - a[0];
   const x1 = b[1] - a[1];
   const x2 = b[2] - a[2];
@@ -54,12 +54,20 @@ function dist(a, b) {
   const x4 = b[4] - a[4];
   const x5 = b[5] - a[5];
   const x6 = b[6] - a[6];
-  return sqrt(
-    x0*x0 + x1*x1 + x2*x2 + x3*x3
-    + x4*x4 + x5*x5 + x6*x6);
+  return x0*x0 + x1*x1 + x2*x2 + x3*x3
+    + x4*x4 + x5*x5 + x6*x6;
+}
+
+function dist(a, b) {
+  return sqrt(dist2(a, b));
+
 }
 
 function lerp(a, b, t, to = create()) {
+  return lerpTo(to, a, b, t);
+}
+
+function lerpTo(to, a, b, t) {
   const it = 1 - t;
 
   to[0] = a[0] * it + b[0] * t;
@@ -104,5 +112,8 @@ function make(tx, ty, tz, qw, qx, qy, qz) {
 export default {
   initial, create, randomize,
   copy, copyTo,
-  dist, lerp, to_sim, make
+  lerp, lerpTo,
+
+  dist, dist2,
+  to_sim, make
 };

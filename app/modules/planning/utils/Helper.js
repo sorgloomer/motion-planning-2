@@ -1,12 +1,11 @@
 import VecN from '/math/VecN';
-
+import Heap from '/algorithm/Heap';
 
 function lineChecker(temp1) {
     return function checkLine(sampler, start, end, step, knownDistance, lerpTo) {
         if (step === undefined) step = 1;
-        temp1.length = VecN.dims(start);
 
-        if (knownDistance === undefined) knownDistance = vec.dist(start, end);
+        if (knownDistance === undefined) knownDistance = VecN.dist(start, end);
 
         var inters = true;
         var inc = step / knownDistance;
@@ -64,14 +63,13 @@ function pathToRoot(parentMap, aNode, costFn, mapperFn) {
 function fnOrMap(fnOrMap) {
     return typeof(fnOrMap) === 'function'
       ? fnOrMap
-      : function mapGetter(key) { return fnOrMap.get(key); };
+      : key => fnOrMap.get(key);
 }
 
-function dijkstra(startNode, endNode, neighboursFnOrMap, distFn) {
+function dijkstra(startNode, endNode, neighboursMap, distFn) {
     var item;
     var queue = new Heap();
     var parentMap = new Map();
-    neighboursFnOrMap = fnOrMap(neighboursFnOrMap);
     queue.push(0, [null, startNode]);
 
     while (item = queue.pop()) {
@@ -84,7 +82,7 @@ function dijkstra(startNode, endNode, neighboursFnOrMap, distFn) {
                 var total = item.key;
                 if (!item) break;
 
-                neighboursFnOrMap(current).forEach(function (neigh) {
+                neighboursMap.get(current).forEach(neigh => {
                     var dist = distFn(current, neigh);
                     queue.push(total + dist, [current, neigh]);
                 });

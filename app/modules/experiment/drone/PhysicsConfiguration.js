@@ -37,12 +37,11 @@ function copy(a) {
   return copyTo(create(), a);
 }
 
-function dist(a, b) {
-  return VecN.dist(a, b);
+function lerp(a, b, t, to = create()) {
+  return lerpTo(to, a, b, t);
 }
 
-
-function lerp(a, b, t, to = create()) {
+function lerpTo(to, a, b, t) {
   const it = 1 - t;
 
   to[0] = a[0] * it + b[0] * t;
@@ -104,7 +103,10 @@ function make(tx, ty, tz, qw, qx, qy, qz) {
 }
 
 export default {
+  dist: VecN.dist, dist2: VecN.dist2,
+
   initial, create, randomize,
   copy, copyTo,
-  dist, lerp, to_sim, make
+  lerp, lerpTo,
+  to_sim, make
 };

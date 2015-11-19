@@ -212,37 +212,45 @@ function mulIP(a, b) {
 */
 
 function transposeTo(to, a) {
-  to[0] = a[0];
-  to[1] = a[3];
-  to[2] = a[6];
+  const a0 = a[0], a1 = a[1], a2 = a[2],
+    a3 = a[3], a4 = a[4], a5 = a[5],
+    a6 = a[6], a7 = a[7], a8 = a[8];
+  to[0] = a0;
+  to[1] = a3;
+  to[2] = a6;
 
-  to[3] = a[1];
-  to[4] = a[4];
-  to[5] = a[7];
+  to[3] = a1;
+  to[4] = a4;
+  to[5] = a7;
 
-  to[6] = a[2];
-  to[7] = a[5];
-  to[8] = a[8];
+  to[6] = a2;
+  to[7] = a5;
+  to[8] = a8;
   return to;
 }
 function invertTo(to, a) {
+  const a0 = a[0], a1 = a[1], a2 = a[2],
+    a3 = a[3], a4 = a[4], a5 = a[5],
+    a6 = a[6], a7 = a[7], a8 = a[8],
+    a9 = a[9], a10 = a[10], a11 = a[11];
+
   // Transpose rotation
-  to[0] = a[0];
-  to[1] = a[3];
-  to[2] = a[6];
+  to[0] = a0;
+  to[1] = a3;
+  to[2] = a6;
 
-  to[3] = a[1];
-  to[4] = a[4];
-  to[5] = a[7];
+  to[3] = a1;
+  to[4] = a4;
+  to[5] = a7;
 
-  to[6] = a[2];
-  to[7] = a[5];
-  to[8] = a[8];
+  to[6] = a2;
+  to[7] = a5;
+  to[8] = a8;
 
   // Multiply translation by inverted rotation and negate
-  to[ 9] = - a[ 9] * a[0] - a[10] * a[1] - a[11] * a[2];
-  to[10] = - a[ 9] * a[3] - a[10] * a[4] - a[11] * a[5];
-  to[11] = - a[ 9] * a[6] - a[10] * a[7] - a[11] * a[8];
+  to[ 9] = - a9 * a0 - a10 * a1 - a11 * a2;
+  to[10] = - a9 * a3 - a10 * a4 - a11 * a5;
+  to[11] = - a9 * a6 - a10 * a7 - a11 * a8;
 
   return to;
 }

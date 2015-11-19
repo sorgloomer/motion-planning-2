@@ -142,7 +142,7 @@ export default class NBoxTree {
     var result = false;
 
     function visit(dot) {
-      if (!result && vec.dist2(dot, p) <= dist2) {
+      if (!result && VecN.dist2(dot, p) <= dist2) {
         result = true;
       }
     }
@@ -168,7 +168,7 @@ export default class NBoxTree {
     var maxDist2 = maxDist * maxDist;
 
     function visit(dot) {
-      var actualDist2 = vec.dist2(dot, p);
+      var actualDist2 = VecN.dist2(dot, p);
       if (actualDist2 <= maxDist2) {
         fn.call(ctx, dot, actualDist2);
       }
@@ -195,5 +195,10 @@ export default class NBoxTree {
     var success = this.root.putDot(dot, 0, this.maxcnt);
     if (!success) throw new Error("NBoxTree.putDot: outside");
     return true;
+  }
+  tryPutDot(dot) {
+    var success = this.root.putDot(dot, 0, this.maxcnt);
+    if (success) this.count++;
+    return success;
   }
 };

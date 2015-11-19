@@ -44,9 +44,10 @@ export default class RrtVoronoi {
   }
 
   putConfig(config, parent) {
-    this.lastPut = config = this.Configuration.copy(config);
+    const Configuration = this.Configuration;
+    this.lastPut = config = Configuration.copy(config);
     this.boxTree.putDot(config);
-    var len2 = VecN.dist2(this.myMap.target, config);
+    var len2 = Configuration.dist2(this.myMap.target, config);
     if (len2 < this.targetDistance2) {
       this.solutionNode = config;
       this.hasSolution = true;
@@ -71,7 +72,7 @@ export default class RrtVoronoi {
     var input_current = this.TEMP_INPUT2;
 
     if (Math.random() < this.greediness) {
-      VecN.copyTo(config_random_target, this.myMap.target);
+      Configuration.copyTo(config_random_target, this.myMap.target);
     } else {
       Configuration.randomize(config_random_target, this.myMap.nbox);
       this.samplesGenerated++;
@@ -87,12 +88,12 @@ export default class RrtVoronoi {
 
     ConfigurationInput.randomize(input_saved);
     ConfigurationInput.applyTo(config_saved, nearest, input_saved);
-    saved_dist = VecN.dist(config_saved, config_random_target);
+    saved_dist = Configuration.dist(config_saved, config_random_target);
 
     for (i = 0; i < this.NEARING_TRIALS; i++) {
       ConfigurationInput.randomize(input_current);
       ConfigurationInput.applyTo(config_current, nearest, input_current);
-      current_dist = VecN.dist(config_current, config_random_target);
+      current_dist = Configuration.dist(config_current, config_random_target);
       if (current_dist < saved_dist) {
         saved_dist = current_dist;
 
@@ -122,7 +123,7 @@ export default class RrtVoronoi {
 
 
     if (!goodSample && this.wrongSampleCallback) {
-      this.wrongSampleCallback(VecN.copy(config_saved));
+      this.wrongSampleCallback(Configuration.copy(config_saved));
     }
   }
 
@@ -131,6 +132,7 @@ export default class RrtVoronoi {
   }
 
   getSolution() {
-    return Helper.pathToRoot(this.parentMap, this.solutionNode, VecN.dist);
+    const Configuration = this.Configuration;
+    return Helper.pathToRoot(this.parentMap, this.solutionNode, Configuration.dist);
   }
 }
