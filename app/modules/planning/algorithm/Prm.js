@@ -11,13 +11,7 @@ const FINE_TUNING_COEFF = 20;
 function Prm(map) {
     var self = this;
 
-
-
-    var dims = map.nbox.dims();
     var boxTree = new NBoxTree(map.nbox);
-    var resolution = map.resolution;
-    // Use hypersphere 4 times the volume of the resolution sphere
-    var connectResolution = FINE_TUNING_COEFF * resolution * Math.pow(4, 1.0 / dims);
 
     const Configuration = map.Configuration;
     var connectedSets = new UnionFind();
@@ -50,9 +44,9 @@ function Prm(map) {
 
         Configuration.copyTo(lastPut, dot);
 
-        boxTree.enumerateInRange(dot, connectResolution, function(dotInTree, knownDistance2) {
+        boxTree.enumerateInRange(dot, map.connectDistance, function(dotInTree, knownDistance2) {
             var dist = Math.sqrt(knownDistance2);
-            var hitsWall = checkLine(map.sampler, dot, dotInTree, 1, dist, Configuration.lerpTo);
+            var hitsWall = checkLine(map.sampler, dot, dotInTree, map.checkResolution, dist, Configuration.lerpTo);
             if (!hitsWall) {
                 makeNeighbours(dot, dotInTree);
             }
@@ -68,7 +62,7 @@ function Prm(map) {
         var goodSample = false;
         if (nearest) {
             var knownDistance = Configuration.dist(nearest, newDot);
-            if (knownDistance > resolution) {
+            if (knownDistance > map.storeResolution) {
                 if (!map.sampler(newDot)) {
                     goodSample = true;
                     putDot(newDot, nearest);

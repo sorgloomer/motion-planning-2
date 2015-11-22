@@ -15,8 +15,6 @@ export default class RrtVoronoi {
     this.samples = [];
     this.targetDistance2 = map.targetDistance * map.targetDistance;
 
-    this.resolution = map.resolution;
-
     this.Configuration = map.Configuration;
     this.ConfigurationInput = map.ConfigurationInput;
 
@@ -61,6 +59,7 @@ export default class RrtVoronoi {
 
 
   putRandomDot() {
+    const myMap = this.myMap;
     const Configuration = this.Configuration;
     const ConfigurationInput = this.ConfigurationInput;
 
@@ -72,9 +71,9 @@ export default class RrtVoronoi {
     var input_current = this.TEMP_INPUT2;
 
     if (Math.random() < this.greediness) {
-      Configuration.copyTo(config_random_target, this.myMap.target);
+      Configuration.copyTo(config_random_target, myMap.target);
     } else {
-      Configuration.randomize(config_random_target, this.myMap.nbox);
+      Configuration.randomize(config_random_target, myMap.nbox);
       this.samplesGenerated++;
     }
     var nearest = this.boxTree.nearest(config_random_target);
@@ -112,8 +111,8 @@ export default class RrtVoronoi {
     var nextNearest = this.boxTree.nearest(config_saved);
     var nextDist = Configuration.dist(nextNearest, config_saved);
 
-    if (nextDist > this.resolution) {
-      var hitsWall = this.lineChecker(this.myMap.sampler, nearest, config_saved, 1, this.resolution, Configuration.lerp);
+    if (nextDist > myMap.storeResolution) {
+      var hitsWall = this.lineChecker(myMap.sampler, nearest, config_saved, myMap.checkResolution, undefined, Configuration.lerp);
       if (!hitsWall) {
         goodSample = true;
         this.putConfig(config_saved, nearest);

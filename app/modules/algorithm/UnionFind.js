@@ -23,12 +23,15 @@ function findRoot(item) {
 export default class UnionFind {
     constructor() {
         this.metaMap = new Map();
+        this.count_unions = 0;
+        this.count_items = 0;
     }
 
     _getMeta(item) {
         const metaMap = this.metaMap;
         var meta = metaMap.get(item);
         if (!meta) {
+            this.count_items++;
             meta = new UnionFindItem(item);
             metaMap.set(item, meta);
         }
@@ -49,6 +52,7 @@ export default class UnionFind {
                 meta1.parent = meta2;
                 meta1.height = max(meta1.height, meta2.height + 1);
             }
+            this.count_unions++;
             return true;
         }
         return false;

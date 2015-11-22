@@ -15,8 +15,12 @@ export default function DroneRingMapPhysics() {
       .concat(DefinitionHelper.makeRing(3.5, 0.5, 12, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0,  0)))
   ;
 
+
   this.sampler = Sampler(this.agentBoxes, this.worldBoxes);
-  this.resolution = 0.03;
+  this.storeResolution = 0.05;
+  this.checkResolution = 0.02;
+
+  this.connectDistance = 0.1;
   this.targetDistance = 0.30;
   this.nbox = NBox.make([
     -7, -5, -10,

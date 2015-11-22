@@ -17,8 +17,11 @@ export default function DroneRingMap() {
   ;
 
   this.sampler = Sampler(this.agentBoxes, this.worldBoxes);
-  this.resolution = 0.05;
-  this.targetDistance = 0.15;
+  this.storeResolution = 0.05; // for all strategies
+  this.checkResolution = 0.04; // for all strategies
+
+  this.connectDistance = 1.50; // for Prm
+  this.targetDistance = 0.15;  // for Rrt
   this.nbox = NBox.make([-7, -7, -7, -1, -1, -1, -1], [7, 7, 7, 1, 1, 1, 1]);
 
   this.start  = Configuration.make(-2.5, -1, -5, 1, 0, 0, 0);

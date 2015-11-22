@@ -17,9 +17,10 @@ function RrtInc(map) {
   var Configuration = map.Configuration;
   var ConfigurationInput = map.ConfigurationInput;
 
-  var resolution = map.resolution;
-  var resolution2 = resolution * resolution * 0.90;
-  var solutionDistance2 = resolution2 * 7; // magic constant
+  var storeResolution = map.storeResolution;
+  var checkResolution = map.checkResolution;
+  var storeResolution2 = storeResolution * storeResolution;
+  var solutionDistance2 = map.targetDistance; // magic constant
 
   var localSampler = map.sampler;
 
@@ -43,15 +44,14 @@ function RrtInc(map) {
   }
 
   function hasNear(p) {
-    return false;
     var result = false;
     function visit(dot) {
-      if (Configuration.dist2(dot, p) < resolution2) {
+      if (Configuration.dist2(dot, p) < storeResolution2) {
         result = true;
       }
     }
     quad.traverse(function(node) {
-      if (result || node.nbox.dist2(p) > resolution2) {
+      if (result || node.nbox.dist2(p) > storeResolution2) {
         return true;
       } else {
         var dots = node.dots;
@@ -68,7 +68,7 @@ function RrtInc(map) {
   function verifyDot(item, edot) {
     var p = item.pos;
     return !hasNear(edot)
-      && !checkLine(localSampler, p, edot, resolution * 0.334, resolution, Configuration.lerpTo);
+      && !checkLine(localSampler, p, edot, checkResolution, storeResolution, Configuration.lerpTo);
   }
 
   function chooseDistRnd(arr) {

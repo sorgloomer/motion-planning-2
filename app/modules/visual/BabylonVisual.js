@@ -13,13 +13,13 @@ class ExperimentScene {
     this.agent_keyframes = null;
   }
 
-  addKeyframes(sims) {
-    this.agent_keyframes = new MeshHelper.CompoundMesh("agent_keyframes", this.scene.scene, sims.map((sim, index) => {
+  addKeyframes(sims, experiment) {
+    this.agent_keyframes = new MeshHelper.CompoundMesh("agent_keyframes", this.scene, sims.map((sim, index) => {
       const m = MeshHelper.meshFromOBoxList(
         'agent_keyframes_items_' + index,
-        this.scene.scene,
-        this.experiment.agentBoxes, m => {
-          m.material = this.scene.mat_wireframe;
+        this.scene,
+        experiment.agentBoxes, m => {
+          m.material = this.mat_wireframe;
         }
       );
       MeshHelper.applyTransform(m, sim);
@@ -121,7 +121,7 @@ export default class BabylonVisual {
     this.engine = null;
     this.startTime = 0;
     this.temp_sim = Sim3.create();
-    this.solution_loop_time = 400;
+    this.solution_loop_time = 7500;
   }
 
   init(timestamp) {
@@ -146,7 +146,7 @@ export default class BabylonVisual {
   _preprocess_render(model, time) {
     if (model.has_solution) {
       if (!this.scene.agent_keyframes) {
-        this.scene.addKeyframes(model.solution_keyframes);
+        this.scene.addKeyframes(model.solution_keyframes, this.experiment);
       }
       model.solutionLerpTo(this.temp_sim, (time / this.solution_loop_time % 1) * model.solution_length);
       MeshHelper.applyTransform(this.scene.mesh_agent, this.temp_sim);

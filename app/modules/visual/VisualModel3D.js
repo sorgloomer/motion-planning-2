@@ -7,6 +7,7 @@ function _solutionLerpTo(toSim, experiment, tempConf, solution, time) {
   const index = integ % (solution.path.length - 1);
   experiment.Configuration.lerpTo(tempConf, solution.path[index], solution.path[index + 1], frac);
   experiment.Configuration.to_sim3(toSim, tempConf);
+  return toSim;
 }
 
 export default class VisualModel3D {
@@ -16,7 +17,8 @@ export default class VisualModel3D {
     this.agent_transform = Sim3.create();
     this.temp_sim = Sim3.create();
     this.temp_configuration = this.experiment.Configuration.create();
-    this.iterations = 20;
+    this._iterations = 5;
+    this.iterations_time = 20;
 
     this.solution = null;
     this.solution_keyframes = null;
@@ -24,9 +26,16 @@ export default class VisualModel3D {
     this.solution_length = 0;
   }
 
+  _iterate() {
+    const mark = Date.now() + this.iterations_time;
+    while (!this.solver.hasSolution) {
+      this.solver.iterate(this._iterations);
+      if (Date.now() >= mark) break;
+    }
+  }
   update() {
     if (!this.has_solution) {
-      this.solver.iterate(this.iterations);
+      this._iterate();
       if (this.solver.hasSolution) {
         this._processSolution(this.solver.getSolution());
       } else {
