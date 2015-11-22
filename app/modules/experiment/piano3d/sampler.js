@@ -1,6 +1,6 @@
 import ObbTreeBuilder from '/collision/obb/ObbTreeBuilder';
 import ObbTreeCollider from '/collision/obb/ObbTreeCollider';
-import Configuration from '/experiment/piano3d/configuration';
+import Configuration from '/experiment/piano3d/Piano3DConfig';
 import Sim3 from '/math/Sim3';
 
 export default function make_sampler(agentBoxes, worldBoxes) {
@@ -11,7 +11,7 @@ export default function make_sampler(agentBoxes, worldBoxes) {
   var collider = new ObbTreeCollider();
 
   return function sampler(config) {
-    Configuration.to_sim(sim, config);
+    Configuration.to_sim3(sim, config);
     return collider.collide(worldTree, agentTree, sim);
   };
 };

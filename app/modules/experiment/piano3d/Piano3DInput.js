@@ -1,5 +1,6 @@
 import QuatEtc from '/math/QuatEtc';
 import Quat from '/math/Quat';
+import Vec3Etc from '/math/Vec3Etc';
 
 const { random } = Math;
 
@@ -22,28 +23,9 @@ function _load_quat(arr, idx, quat) {
   quat[3] = arr[idx + 3];
 }
 
-
-function _random_vec3_in_sphere(x, idx = 0, radius = 1) {
-  for (var i = 0; i < 20; i++) {
-    var x0 = random() * 2 - 1;
-    var x1 = random() * 2 - 1;
-    var x2 = random() * 2 - 1;
-    var l2 = x0*x0 + x1*x1 + x2*x2;
-    if (l2 <= 1) {
-      x[idx + 0] = x0 * radius;
-      x[idx + 1] = x1 * radius;
-      x[idx + 2] = x2 * radius;
-      return;
-    }
-  }
-  x[idx + 0] = 0;
-  x[idx + 1] = 0;
-  x[idx + 2] = 0;
-}
-
 function randomize(c = create()) {
-  _random_vec3_in_sphere(c, 0, 1);
-  _random_vec3_in_sphere(c, 3, 1);
+  Vec3Etc.uniformInSphere(c, 0, 1);
+  Vec3Etc.uniformInSphere(c, 3, 1);
   return c;
 }
 

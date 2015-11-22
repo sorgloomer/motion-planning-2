@@ -1,12 +1,13 @@
-
 import QuatEtc from '/math/QuatEtc';
 import Quat from '/math/Quat';
 import VecN from '/math/VecN';
+import Sim3 from '/math/Sim3';
 
 const { random, sqrt } = Math;
 
 const temp_quat = Quat.create();
 const temp_quat2 = Quat.create();
+const temp_sim = Sim3.create();
 
 function rinterval(a, b) {
   return random() * (b - a) + a;
@@ -44,41 +45,36 @@ function lerp(a, b, t, to = create()) {
 function lerpTo(to, a, b, t) {
   const it = 1 - t;
 
-  to[0] = a[0] * it + b[0] * t;
-  to[1] = a[1] * it + b[1] * t;
-  to[2] = a[2] * it + b[2] * t;
-  to[3] = a[3];
-  to[4] = a[4];
-  to[5] = a[5];
+  for (let i = 0; i < 6; i++) to[i] = a[i] * it + b[i] * t;
+
   _load_quat(a, temp_quat);
   _load_quat(b, temp_quat2);
   Quat.slerpIP(temp_quat, temp_quat2, t);
   _store_quat(to, temp_quat);
-  to[10] = a[10];
-  to[11] = a[11];
-  to[12] = a[12];
+
+  for (let i = 10; i < 13; i++) to[i] = a[i] * it + b[i] * t;
   return to;
 }
 
 
 function initial(to = create()) {
-  to[0] = 0;
-  to[1] = 0;
-  to[2] = 0;
-  to[3] = 0;
-  to[4] = 0;
-  to[5] = 0;
-  to[6] = 1;
-  to[7] = 0;
-  to[8] = 0;
-  to[9] = 0;
-  to[10] = 0;
-  to[11] = 0;
-  to[12] = 0;
+  to[0] = 0; // px
+  to[1] = 0; // py
+  to[2] = 0; // pz
+  to[3] = 0; // vx
+  to[4] = 0; // vy
+  to[5] = 0; // vz
+  to[6] = 1; // qw
+  to[7] = 0; // qx
+  to[8] = 0; // qy
+  to[9] = 0; // qz
+  to[10] = 0; // ox
+  to[11] = 0; // oy
+  to[12] = 0; // oz
   return to;
 }
 
-function to_sim(sim, conf) {
+function to_sim3(sim, conf) {
   _load_quat(conf, temp_quat);
   QuatEtc.transformQXYZ(sim, temp_quat, conf[0], conf[1], conf[2]);
   return sim;
@@ -102,11 +98,20 @@ function make(tx, ty, tz, qw, qx, qy, qz) {
   return r;
 }
 
-export default {
-  dist: VecN.dist, dist2: VecN.dist2,
+function randomize(config, nbox) {
+  for (let i = 0; i < 6; i++) config[i] = rinterval(nbox.min[i], nbox.max[i]);
+  QuatEtc.setRandomUnit(temp_quat);
+  _store_quat(config, temp_quat);
+  for (let i = 10; i < 13; i++) config[i] = rinterval(nbox.min[i], nbox.max[i]);
+  return config;
+}
 
+
+export default {
   initial, create, randomize,
   copy, copyTo,
   lerp, lerpTo,
-  to_sim, make
+
+  dist: VecN.dist, dist2: VecN.dist2,
+  to_sim3, make
 };

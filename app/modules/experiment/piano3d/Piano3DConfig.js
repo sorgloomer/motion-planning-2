@@ -91,7 +91,7 @@ function initial(to = create()) {
   return to;
 }
 
-function to_sim(sim, conf) {
+function to_sim3(sim, conf) {
   _load_quat(conf, temp_quat);
   QuatEtc.transformQXYZ(sim, temp_quat, conf[0], conf[1], conf[2]);
   return sim;
@@ -115,5 +115,5 @@ export default {
   lerp, lerpTo,
 
   dist, dist2,
-  to_sim, make
+  to_sim3, make
 };
