@@ -13,12 +13,12 @@ class ExperimentScene {
     this.agent_keyframes = null;
   }
 
-  addKeyframes(sims, experiment) {
+  addKeyAgents(sims, model) {
     this.agent_keyframes = new MeshHelper.CompoundMesh("agent_keyframes", this.scene, sims.map((sim, index) => {
       const m = MeshHelper.meshFromOBoxList(
         'agent_keyframes_items_' + index,
         this.scene,
-        experiment.agentBoxes, m => {
+        model.agentBoxes, m => {
           m.material = this.mat_wireframe;
         }
       );
@@ -33,7 +33,7 @@ class ExperimentScene {
 }
 
 
-function createScene(canvas, engine, worldBoxes, agentBoxes) {
+function createScene(canvas, engine, model) {
   var scene = new BABYLON.Scene(engine);
   scene.clearColor = new BABYLON.Color3(0.7, 0.9, 1);
   var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 4, -8), scene);
@@ -71,7 +71,7 @@ function createScene(canvas, engine, worldBoxes, agentBoxes) {
   mat_ground.diffuseColor = new BABYLON.Color3(0.8, 0.8, 0.8);
   mat_ground.specularColor = new BABYLON.Color3(0, 0, 0);
 
-  var mesh_agent = MeshHelper.meshFromOBoxList('agent', scene, agentBoxes, m => m.material = mat_agent);
+  var mesh_agent = MeshHelper.meshFromOBoxList('agent', scene, model.agentBoxes, m => m.material = mat_agent);
 
   // Skybox
   var skybox = BABYLON.Mesh.CreateBox("skyBox", 500.0, scene);
@@ -94,7 +94,7 @@ function createScene(canvas, engine, worldBoxes, agentBoxes) {
 
   const allObjects = [];
 
-  const mesh_world = MeshHelper.meshFromOBoxList('world', scene, worldBoxes, b => b.material = mat_world);
+  const mesh_world = MeshHelper.meshFromOBoxList('world', scene, model.worldBoxes, b => b.material = mat_world);
 
   const shadowCasters = shadowGenerator.getShadowMap().renderList;
   allObjects.push(...mesh_agent.my_children);
@@ -128,8 +128,7 @@ export default class BabylonVisual {
     this.engine = new BABYLON.Engine(this.canvas, true);
     this.scene = createScene(
       this.canvas, this.engine,
-      this.experiment.worldBoxes,
-      this.experiment.agentBoxes);
+      this.experiment.model);
     this.startTime = timestamp;
   }
   run(fn) {
@@ -146,7 +145,7 @@ export default class BabylonVisual {
   _preprocess_render(model, time) {
     if (model.has_solution) {
       if (!this.scene.agent_keyframes) {
-        this.scene.addKeyframes(model.solution_keyframes, this.experiment);
+        this.scene.addKeyAgents(model.solution_keyframes, this.experiment.model);
       }
       model.solutionLerpTo(this.temp_sim, (time / this.solution_loop_time % 1) * model.solution_length);
       MeshHelper.applyTransform(this.scene.mesh_agent, this.temp_sim);

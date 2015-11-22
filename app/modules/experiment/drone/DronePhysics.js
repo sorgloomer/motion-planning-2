@@ -1,4 +1,4 @@
-import DroneBoxes from '/experiment/drone/drone_boxes';
+import DroneBoxes from '/experiment/drone/DroneBoxes';
 import Sampler from '/experiment/piano3d/Sampler';
 import Configuration from '/experiment/drone/PhysicsConfig';
 import ConfigurationInput from '/experiment/drone/PhysicsInput';
@@ -7,8 +7,7 @@ import {PI} from '/utils/math';
 import Sim3 from '/math/Sim3';
 import NBox from '/math/NBox';
 
-
-export default function DroneRingMapPhysics() {
+function Drone2Model() {
   this.agentBoxes = DroneBoxes.boxList;
   this.worldBoxes =
     []
@@ -16,7 +15,12 @@ export default function DroneRingMapPhysics() {
   ;
 
 
-  this.sampler = Sampler(this.agentBoxes, this.worldBoxes);
+}
+
+export default function DroneRingMapPhysics() {
+  this.model = new Drone2Model();
+
+  this.sampler = Sampler(this.model);
   this.storeResolution = 0.05;
   this.checkResolution = 0.02;
 

@@ -22,6 +22,7 @@ export default class VisualModel3D {
 
     this.solution = null;
     this.solution_keyframes = null;
+    this.solution_keyframe_count = 5;
     this.has_solution = false;
     this.solution_length = 0;
   }
@@ -49,7 +50,7 @@ export default class VisualModel3D {
   _processSolution(solution) {
     this.solution = solution;
 
-    const COUNT = 4;
+    const COUNT = this.solution_keyframe_count;
     const FULL_TIME = solution.path.length - 1.0001;
 
     this.solution_keyframes = lists.generate(

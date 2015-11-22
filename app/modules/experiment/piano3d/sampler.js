@@ -3,10 +3,10 @@ import ObbTreeCollider from '/collision/obb/ObbTreeCollider';
 import Configuration from '/experiment/piano3d/Piano3DConfig';
 import Sim3 from '/math/Sim3';
 
-export default function make_sampler(agentBoxes, worldBoxes) {
+export default function make_sampler(model) {
   var builder = new ObbTreeBuilder();
-  var worldTree = builder.buildBoxTree(worldBoxes);
-  var agentTree = builder.buildBoxTree(agentBoxes);
+  var worldTree = builder.buildBoxTree(model.worldBoxes);
+  var agentTree = builder.buildBoxTree(model.agentBoxes);
   var sim = Sim3.create();
   var collider = new ObbTreeCollider();
 
