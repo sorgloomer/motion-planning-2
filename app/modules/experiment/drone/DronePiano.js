@@ -1,5 +1,5 @@
 import DroneBoxes from '/experiment/drone/DroneBoxes';
-import Sampler from '/experiment/piano3d/Sampler';
+import Sampler3D from '/experiment/piano3d/Sampler3D';
 import Configuration from '/experiment/piano3d/Piano3DConfig';
 import ConfigurationInput from '/experiment/piano3d/Piano3DInput';
 import DefinitionHelper from '/experiment/common/DefinitionHelper';
@@ -19,13 +19,14 @@ function DroneRingModel() {
 export default function DroneRingMap() {
   this.model = new DroneRingModel();
 
-  this.sampler = Sampler(this.model);
+  this.sampler = new Sampler3D(this.model);
   this.storeResolution = 0.05; // for all strategies
   this.checkResolution = 0.04; // for all strategies
 
   this.connectDistance = 1.50; // for Prm
   this.targetDistance = 0.15;  // for Rrt
-  this.nbox = NBox.make([-7, -7, -7, -1, -1, -1, -1], [7, 7, 7, 1, 1, 1, 1]);
+
+  this.sampleBounds = NBox.make([-7, -7, -7, -1, -1, -1, -1], [7, 7, 7, 1, 1, 1, 1]);
 
   this.start  = Configuration.make(-2.5, -1, -5, 1, 0, 0, 0);
   this.target = Configuration.make(-2.5, +1, +5, 1, 0, 0, 0);

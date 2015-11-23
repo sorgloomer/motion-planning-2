@@ -1,6 +1,6 @@
 import Sim3 from '/math/Sim3';
 import Vec3 from '/math/Vec3';
-import OBox from '/collision/obb/Obb';
+import OBox from '/collision/obb3/Obb3';
 import lists from '/utils/lists';
 import { RAD_TO_DEG, DEG_TO_RAD, TWO_PI, PI } from '/utils/math';
 

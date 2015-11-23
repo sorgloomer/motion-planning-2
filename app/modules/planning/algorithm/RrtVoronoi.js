@@ -7,7 +7,7 @@ export default class RrtVoronoi {
   constructor(map) {
 
     this.myMap = map;
-    this.boxTree = new NBoxTree(map.nbox.fatten(2));
+    this.boxTree = new NBoxTree(map.sampleBounds.fatten(2));
     this.greediness = 0.05;
     this.solutionNode = null;
     this.parentMap = new Map();
@@ -36,7 +36,7 @@ export default class RrtVoronoi {
     this.trialDist = 1e50;
 
     this.lastPut = null;
-    this.lineChecker = Helper.lineChecker(this.Configuration.create());
+    this.lineChecker = new Helper.LineChecker(this.Configuration.create());
 
     this.putConfig(map.start, null);
   }
@@ -73,7 +73,7 @@ export default class RrtVoronoi {
     if (Math.random() < this.greediness) {
       Configuration.copyTo(config_random_target, myMap.target);
     } else {
-      Configuration.randomize(config_random_target, myMap.nbox);
+      Configuration.randomize(config_random_target, myMap.sampleBounds);
       this.samplesGenerated++;
     }
     var nearest = this.boxTree.nearest(config_random_target);
@@ -112,7 +112,7 @@ export default class RrtVoronoi {
     var nextDist = Configuration.dist(nextNearest, config_saved);
 
     if (nextDist > myMap.storeResolution) {
-      var hitsWall = this.lineChecker(myMap.sampler, nearest, config_saved, myMap.checkResolution, undefined, Configuration.lerp);
+      var hitsWall = this.lineChecker.check(myMap.sampler, nearest, config_saved, myMap.checkResolution, undefined, Configuration.lerp);
       if (!hitsWall) {
         goodSample = true;
         this.putConfig(config_saved, nearest);

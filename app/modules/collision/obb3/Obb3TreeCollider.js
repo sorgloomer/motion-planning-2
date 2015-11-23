@@ -1,9 +1,9 @@
-import OBoxCollider from '/collision/obb/ObbCollider';
+import OBoxCollider from '/collision/obb3/Obb3Collider';
 import Sim3 from '/math/Sim3';
 import Sim3Etc from '/math/Sim3Etc';
 import lists from '/utils/lists';
-import BoxTreeNode from '/collision/obb/ObbTreeNode';
-import OBox from '/collision/obb/Obb';
+import BoxTreeNode from '/collision/obb3/Obb3TreeNode';
+import OBox from '/collision/obb3/Obb3';
 
 
 const {sqrt} = Math;

@@ -1,25 +1,27 @@
 import VecN from '/math/VecN';
 import Heap from '/algorithm/Heap';
 
-function lineChecker(temp1) {
-    return function checkLine(sampler, start, end, step, knownDistance, lerpTo) {
+class LineChecker {
+    constructor(temp_config) {
+        this.temp_config = temp_config;
+    }
+
+    check(sampler, start, end, step, knownDistance, lerpTo) {
         if (step === undefined) step = 1;
-
         if (knownDistance === undefined) knownDistance = VecN.dist(start, end);
-
+        const temp1 = this.temp_config;
         var inters = true;
         var inc = step / knownDistance;
         for (var i = inc; i < 1; i += inc) {
             lerpTo(temp1, start, end, i);
-            if (sampler(temp1)) {
+            if (sampler.sample(temp1)) {
                 inters = false;
                 break;
             }
         }
-        return !inters || sampler(end);
+        return !inters || sampler.sample(end);
     }
 }
-
 
 function randomDotInBox(nbox, dot, dims) {
     for (var i = 0; i < dims; i++) {
@@ -100,7 +102,7 @@ function iterate(self, fn, trialCount) {
 }
 
 export default {
-    lineChecker,
+    LineChecker,
     randomDotInBox,
     pathToRoot,
     iterate,

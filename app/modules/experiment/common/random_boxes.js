@@ -1,5 +1,5 @@
-import OBox from '/collision/obb/Obb';
-import BoxTreeBuilder from '/collision/obb/ObbTreeBuilder';
+import OBox from '/collision/obb3/Obb3';
+import BoxTreeBuilder from '/collision/obb3/Obb3TreeBuilder';
 import lists from '/utils/lists';
 
 

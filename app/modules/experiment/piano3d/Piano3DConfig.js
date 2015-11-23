@@ -113,7 +113,7 @@ export default {
   initial, create, randomize,
   copy, copyTo,
   lerp, lerpTo,
-
   dist, dist2,
+
   to_sim3, make
 };

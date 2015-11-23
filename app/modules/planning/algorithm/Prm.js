@@ -11,7 +11,7 @@ const FINE_TUNING_COEFF = 20;
 function Prm(map) {
     var self = this;
 
-    var boxTree = new NBoxTree(map.nbox);
+    var boxTree = new NBoxTree(map.sampleBounds);
 
     const Configuration = map.Configuration;
     var connectedSets = new UnionFind();
@@ -22,7 +22,7 @@ function Prm(map) {
     var startNode = Configuration.copy(map.target);
     var endNode = Configuration.copy(map.start);
     const lastPut = Configuration.create();
-    const checkLine = Helper.lineChecker(Configuration.create());
+    const lineChecker = new Helper.LineChecker(Configuration.create());
 
 
     putDot(startNode);
@@ -46,7 +46,7 @@ function Prm(map) {
 
         boxTree.enumerateInRange(dot, map.connectDistance, function(dotInTree, knownDistance2) {
             var dist = Math.sqrt(knownDistance2);
-            var hitsWall = checkLine(map.sampler, dot, dotInTree, map.checkResolution, dist, Configuration.lerpTo);
+            var hitsWall = lineChecker.check(map.sampler, dot, dotInTree, map.checkResolution, dist, Configuration.lerpTo);
             if (!hitsWall) {
                 makeNeighbours(dot, dotInTree);
             }
@@ -56,14 +56,14 @@ function Prm(map) {
 
     function putRandomDot() {
         var newDot = Configuration.create();
-        Configuration.randomize(newDot, map.nbox);
+        Configuration.randomize(newDot, map.sampleBounds);
         self.samplesGenerated++;
         var nearest = boxTree.nearest(newDot);
         var goodSample = false;
         if (nearest) {
             var knownDistance = Configuration.dist(nearest, newDot);
             if (knownDistance > map.storeResolution) {
-                if (!map.sampler(newDot)) {
+                if (!map.sampler.sample(newDot)) {
                     goodSample = true;
                     putDot(newDot, nearest);
                 }

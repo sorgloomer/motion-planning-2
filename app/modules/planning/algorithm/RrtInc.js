@@ -11,7 +11,7 @@ function RrtInc(map) {
   var edges = this.edges = [];
   this.map = map;
 
-  var quad = new NBoxTree(map.nbox);
+  var quad = new NBoxTree(map.sampleBounds);
   var trialCount = 0;
   var target = map.target;
   var Configuration = map.Configuration;
@@ -64,11 +64,11 @@ function RrtInc(map) {
   }
 
 
-  const checkLine = Helper.lineChecker(Configuration.create());
+  const lineChecker = new Helper.LineChecker(Configuration.create());
   function verifyDot(item, edot) {
     var p = item.pos;
     return !hasNear(edot)
-      && !checkLine(localSampler, p, edot, checkResolution, storeResolution, Configuration.lerpTo);
+      && !lineChecker.check(localSampler, p, edot, checkResolution, storeResolution, Configuration.lerpTo);
   }
 
   function chooseDistRnd(arr) {

@@ -1,5 +1,5 @@
 import DroneBoxes from '/experiment/drone/DroneBoxes';
-import Sampler from '/experiment/piano3d/Sampler';
+import Sampler3D from '/experiment/piano3d/Sampler3D';
 import Configuration from '/experiment/drone/PhysicsConfig';
 import ConfigurationInput from '/experiment/drone/PhysicsInput';
 import DefinitionHelper from '/experiment/common/DefinitionHelper';
@@ -13,14 +13,13 @@ function Drone2Model() {
     []
       .concat(DefinitionHelper.makeRing(3.5, 0.5, 12, Sim3.translateXYZ(Sim3.rotationX(PI / 2), 0, 0,  0)))
   ;
-
-
 }
+
 
 export default function DroneRingMapPhysics() {
   this.model = new Drone2Model();
 
-  this.sampler = Sampler(this.model);
+  this.sampler = new Sampler3D(this.model);
   this.storeResolution = 0.05;
   this.checkResolution = 0.02;
 

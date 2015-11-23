@@ -1,10 +1,11 @@
-(function() {
-  "use strict";
+import NBox from '/math/NBox';
+import RrtVoronoi from '/planning/algorithm/RrtVoronoi';
+import CurvedPianoExperiment from '/experiment/curved_piano/CurvedPianoExperiment';
 
-  var SelectedAlgorithm = require('planning.RrtVoronoi');
-  var Experiment = ArmExperiment;
-  
-  var NBox = require('math.NBox');
+function main(params) {
+  var SelectedAlgorithm = RrtVoronoi;
+  var Experiment = CurvedPianoExperiment;
+
   var totalTime = 0;
   var view, viewport, viewmodel;
 
@@ -93,4 +94,7 @@
   startUp();
 
   self.restart = restart;
-})();
+}
+
+
+export default { main };

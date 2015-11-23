@@ -1,9 +1,9 @@
 import Vec3 from '/math/Vec3';
 import Sim3 from '/math/Sim3';
-import OBox from '/collision/obb/Obb';
-import OBoxCollider from '/collision/obb/ObbCollider';
+import OBox from '/collision/obb3/Obb3';
+import OBoxCollider from '/collision/obb3/Obb3Collider';
 import lists from '/utils/lists';
-import BoxTreeNode from '/collision/obb/ObbTreeNode';
+import BoxTreeNode from '/collision/obb3/Obb3TreeNode';
 
 const { random, sqrt, max, min, floor } = Math;
 function randomUnitVec3(result = Vec3.create()) {
