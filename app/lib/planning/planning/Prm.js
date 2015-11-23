@@ -13,8 +13,8 @@ define('planning.Prm', [
     function Prm(map) {
         var self = this;
 
-        var dims = map.nbox.dims();
-        var boxTree = new NBoxTree(map.nbox);
+        var dims = map.sampleBounds.dims();
+        var boxTree = new NBoxTree(map.sampleBounds);
         var resolution = map.resolution;
         // Use hypersphere 4 times the volume of the resolution sphere
         var connectResolution = resolution * Math.pow(4, 1.0 / dims);
@@ -56,7 +56,7 @@ define('planning.Prm', [
 
         function putRandomDot() {
             var newDot = vec.alloc(dims);
-            helper.randomDotInBox(map.nbox, newDot, dims);
+            helper.randomDotInBox(map.sampleBounds, newDot, dims);
             self.samplesGenerated++;
             var nearest = boxTree.nearest(newDot);
             var goodSample = false;

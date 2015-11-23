@@ -1,7 +1,7 @@
 import similar2 from '/math/Sim2';
 import vecn from '/math/VecN';
 
-var DT = 0.2;
+var DT = 0.1;
 
 function rspan(x) {
   return (Math.random() * 2 - 1) * x;

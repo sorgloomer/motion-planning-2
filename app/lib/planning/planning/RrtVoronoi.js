@@ -13,8 +13,8 @@ define('planning.RrtVoronoi', [
 
     var NEARING_TRIALS = 1;
 
-    var dims = map.nbox.dims();
-    var boxTree = new NBoxTree(map.nbox.fatten(2));
+    var dims = map.sampleBounds.dims();
+    var boxTree = new NBoxTree(map.sampleBounds.fatten(2));
     var resolution = map.resolution;
     var targetDistance2 = map.targetDistance * map.targetDistance;
     var greediness = 0.05;
@@ -65,7 +65,7 @@ define('planning.RrtVoronoi', [
       if (Math.random() < greediness) {
         vec.copyTo(config_random_target, map.target);
       } else {
-        Configuration.randomize(config_random_target, map.nbox);
+        Configuration.randomize(config_random_target, map.sampleBounds);
         _this.samplesGenerated++;
       }
       var nearest = boxTree.nearest(config_random_target);

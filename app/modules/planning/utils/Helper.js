@@ -74,7 +74,7 @@ function dijkstra(startNode, endNode, neighboursMap, distFn) {
     var parentMap = new Map();
     queue.push(0, [null, startNode]);
 
-    while (item = queue.pop()) {
+    while (item = queue.popEntry()) {
         var current = item.value[1];
         if (!parentMap.has(current)) {
             parentMap.set(current, item.value[0]);

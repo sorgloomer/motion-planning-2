@@ -1,3 +1,4 @@
+import Heap from '/algorithm/Heap';
 import NBox from '/math/NBox';
 import NBoxTree from '/math/NBoxTree';
 import Helper from '/planning/utils/Helper';
@@ -5,10 +6,27 @@ import { comparerByField } from '/utils/order';
 
 var itemCmp = comparerByField("score");
 
+function SampleItem(pos, parent) {
+  this.pos = pos;
+  this.fails = 0;
+  this.parent = parent;
+  this.score = 0;
+  this.fails = 0;
+  this.path_length = parent ? parent.path_length + 1 : 0;
+  this.init_score = 0;
+}
+
+function choose_random(items) {
+  const index = Math.floor((items.length - 0.0001) * Math.random());
+  return items[index];
+}
+
 function RrtInc(map) {
   var _this = this;
   var samples = this.samples = [];
   var edges = this.edges = [];
+
+  const sampleHeap = new Heap();
   this.map = map;
 
   var quad = new NBoxTree(map.sampleBounds);
@@ -30,12 +48,22 @@ function RrtInc(map) {
 
   putNewItemByPos(map.start, null);
 
+  function setItemInitialScore(item) {
+    item.init_score =
+      Math.pow(Configuration.dist(item.pos, target), 1.2) * 2
+      + Math.pow(item.path_length, 1.1) * 0.05;
+    item.score = item.init_score * 5;
+  }
+
 
   function putNewItemByPos(dot, parent) {
     dot = Configuration.copy(dot);
-    var item = { pos: dot, fails: 0, parent: parent };
+    var item = new SampleItem(dot, parent);
     if (putDotInTree(dot)) {
+
+      setItemInitialScore(item);
       samples.push(item);
+      putItemToHeap(item);
       if (parent) {
         edges.push([parent, item]);
       }
@@ -51,7 +79,7 @@ function RrtInc(map) {
       }
     }
     quad.traverse(function(node) {
-      if (result || node.nbox.dist2(p) > storeResolution2) {
+      if (result || node.sampleBounds.dist2(p) > storeResolution2) {
         return true;
       } else {
         var dots = node.dots;
@@ -71,18 +99,15 @@ function RrtInc(map) {
       && !lineChecker.check(localSampler, p, edot, checkResolution, undefined, Configuration.lerpTo);
   }
 
-  function chooseDistRnd(arr) {
-    var idx = Math.random();
-    idx *= idx;
-    idx *= idx;
-    idx = Math.floor(idx * (arr.length - 0.00001));
-    return arr[idx];
+  function chooseByScore() {
+    return sampleHeap.popValue();
   }
 
-  function putRandomDot() {
-    var item = chooseDistRnd(samples);
-    trialCount++;
+  function putItemToHeap(item) {
+    sampleHeap.push(item.score, item);
+  }
 
+  function processRandomItem(item) {
     ConfigurationInput.randomize(TEMP_INPUT);
     var dot = Configuration.copyTo(TEMP, item.pos);
     ConfigurationInput.applyIP(dot, TEMP_INPUT);
@@ -94,31 +119,33 @@ function RrtInc(map) {
         _this.hasSolution = true;
         solutionSample = newItem;
       }
+      item.score += item.init_score * 0.5;
     } else {
       if (_this.wrongSampleCallback) {
         _this.wrongSampleCallback(dot);
       }
       item.fails++;
+      item.score += item.fails * item.init_score;
     }
   }
 
-  function itemScore(a) {
-    return a.fails + Configuration.dist(a.pos, target) * 0.02;
-  }
+  function putRandomDot() {
+    trialCount++;
+    if (Math.random() < 0.5) {
+      var item = chooseByScore();
+      processRandomItem(item);
+      putItemToHeap(item);
+    } else {
+      processRandomItem(choose_random(samples));
+    }
 
+  }
 
   function putDotInTree(dot) {
     return quad.tryPutDot(dot, 0);
   }
 
   function iterate(sampleCnt) {
-    if (Math.random() < 0.002) {
-      for (let i = 0; i < samples.length; i++) {
-        let item = samples[i];
-        item.score = itemScore(item);
-      }
-      samples.sort(itemCmp);
-    }
     Helper.iterate(_this, putRandomDot, sampleCnt);
   }
 

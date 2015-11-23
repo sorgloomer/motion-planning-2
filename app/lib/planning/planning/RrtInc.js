@@ -17,7 +17,7 @@ define('planning.RrtInc', [
     var edges = this.edges = [];
     this.map = map;
 
-    var quad = new NBoxTree(map.nbox);
+    var quad = new NBoxTree(map.sampleBounds);
     var trialCount = 0;
     var target = map.target;
     var Configuration = map.configuration;
@@ -55,7 +55,7 @@ define('planning.RrtInc', [
         }
       }
       quad.traverse(function(node) {
-        if (result || node.nbox.dist2(p) > resolution2) {
+        if (result || node.sampleBounds.dist2(p) > resolution2) {
           return true;
         } else {
           var dots = node.dots;

@@ -32,7 +32,7 @@ export default class Heap {
         list[index] = cursor;
     }
 
-    pop() {
+    popEntry() {
         const list = this.list;
         var result = list[0];
         if (list.length > 1) {
@@ -60,6 +60,9 @@ export default class Heap {
             list.length = 0;
         }
         return result;
+    }
+    popValue() {
+        return this.popEntry().value;
     }
     peek() {
         return this.list[0];

@@ -1,7 +1,7 @@
 
 define('math.NBoxTree', [ 'math.vec' ], function(vec) {
   function Node(nbox) {
-    this.nbox = nbox;
+    this.sampleBounds = nbox;
     this.ch = null;
     this.dots = [];
   }
@@ -34,7 +34,7 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
 
   NodeProto.putDot = function (dot, depth, maxcnt) {
     var ch = this.ch;
-    if (this.nbox.contains(dot)) {
+    if (this.sampleBounds.contains(dot)) {
       if (!ch && this.dots.length > maxcnt) {
         ch = this.split(depth + 1);
       }
@@ -50,7 +50,7 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
   };
 
   NodeProto.split = function (depth) {
-    var ch = this.ch = this.nbox.split2().map(newNode);
+    var ch = this.ch = this.sampleBounds.split2().map(newNode);
     this.dots.forEach(function (dot) {
       putChild(dot, ch, depth);
     });
@@ -120,14 +120,14 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     }
 
     function intrav(node) {
-      if (node.nbox.contains(dot)) {
+      if (node.sampleBounds.contains(dot)) {
         bound(node);
       }
     }
 
     function outtrav(node) {
-      if ((currentBest === null || node.nbox.dist2(dot) < currentRadius2)
-        && !node.nbox.contains(dot)) {
+      if ((currentBest === null || node.sampleBounds.dist2(dot) < currentRadius2)
+        && !node.sampleBounds.contains(dot)) {
         bound(node);
       }
     }
@@ -161,7 +161,7 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     }
 
     function bound(node) {
-      if (node.nbox.dist2(p) <= dist2) {
+      if (node.sampleBounds.dist2(p) <= dist2) {
         var ch = node.ch;
         var dots = node.dots;
         if (dots) {
@@ -188,7 +188,7 @@ define('math.NBoxTree', [ 'math.vec' ], function(vec) {
     }
 
     function bound(node) {
-      if (node.nbox.dist2(p) <= maxDist2) {
+      if (node.sampleBounds.dist2(p) <= maxDist2) {
         var ch = node.ch;
         var dots = node.dots;
         if (dots) {
