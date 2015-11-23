@@ -1,3 +1,3 @@
 
-import IndexDetect from '/IndexDetect';
+import IndexDetect from '/entry/IndexDetect';
 IndexDetect.main();
