@@ -40,8 +40,8 @@ export default class VisualModel3D {
       if (this.solver.hasSolution) {
         this._processSolution(this.solver.getSolution());
       } else {
-        if (this.solver.lastPut) {
-          this.experiment.Configuration.to_sim3(this.agent_transform, this.solver.lastPut);
+        if (this.solver.conf_trial) {
+          this.experiment.Configuration.to_sim3(this.agent_transform, this.solver.conf_trial);
         }
       }
     }

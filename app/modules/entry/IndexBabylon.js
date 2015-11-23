@@ -1,3 +1,4 @@
+import query from '/utils/query';
 import loaded from '/utils/loaded';
 import { default_dict } from '/utils/dicts';
 
@@ -14,7 +15,9 @@ const EXPERIMENTS = default_dict(Drone1, {
   drone2: Drone2
 });
 
-function main(params) {
+function main() {
+  const params = query.get_params();
+
   loaded(() => {
     const canvas = document.getElementById("render-canvas");
     const Experiment = EXPERIMENTS.get(params.get('exp'));

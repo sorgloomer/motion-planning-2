@@ -1,5 +1,11 @@
+import query from '/utils/query';
+
 import NBox from '/math/NBox';
 import CurvedPianoExperiment from '/experiments_old/experiment/curved_piano/CurvedPianoExperiment';
+import ArmExperiment4 from '/experiments_old/experiment/arm/ArmExperiment4';
+import ArmExperiment6 from '/experiments_old/experiment/arm/ArmExperiment6';
+import ParkingExperiment from '/experiments_old/experiment/parking/ParkingExperiment';
+import PhParkingExperiment from '/experiments_old/experiment/parking_physics/PhParkingExperiment';
 import { default_dict } from '/utils/dicts';
 import { ALGORITHMS } from '/entry/Common';
 
@@ -7,11 +13,17 @@ import CssViewModel from '/experiments_old/visual/CssViewModel';
 import CssView from '/experiments_old/visual/CssView';
 
 const EXPERIMENTS = default_dict(CurvedPianoExperiment, {
-  curved: CurvedPianoExperiment
+  curved: CurvedPianoExperiment,
+  park: ParkingExperiment,
+  park2: PhParkingExperiment,
+  arm4: ArmExperiment4,
+  arm6: ArmExperiment6
 });
 
 
-function main(params) {
+function main() {
+  const params = query.get_params();
+
   var SelectedAlgorithm = ALGORITHMS.get(params.get('alg'));
   var Experiment = EXPERIMENTS.get(params.get('exp'));
 
@@ -37,7 +49,7 @@ function main(params) {
 
   function restart() {
     totalTime = 0;
-    experiment.model.reset();
+    experiment = new Experiment();
   }
 
 

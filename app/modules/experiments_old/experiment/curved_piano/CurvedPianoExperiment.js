@@ -2,7 +2,7 @@ import NBox from '/math/NBox';
 import CurvedPianoConfig from '/experiments_old/experiment/curved_piano/CurvedPianoConfig';
 import CurvedPianoInput from '/experiments_old/experiment/curved_piano/CurvedPianoInput';
 import CurvedWorld from '/experiments_old/experiment/curved_piano/CurvedWorld';
-import PianoSampler from '/experiments_old/experiment/piano2d/PianoSampler';
+import PianoSampler from '/experiments_old/experiment/common/PianoSampler';
 
 function CurvedPianoExperiment() {
   this.model = CurvedWorld;

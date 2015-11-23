@@ -110,9 +110,12 @@ function V(...args) {
 function make(args) {
   return new Float64Array(args);
 }
-
+function create(dims) {
+  return new Float64Array(dims);
+}
 export default {
   V,
+  create,
   make,
   alloc,
   zero,

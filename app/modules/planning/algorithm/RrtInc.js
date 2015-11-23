@@ -20,7 +20,7 @@ function RrtInc(map) {
   var storeResolution = map.storeResolution;
   var checkResolution = map.checkResolution;
   var storeResolution2 = storeResolution * storeResolution;
-  var solutionDistance2 = map.targetDistance; // magic constant
+  var solutionDistance2 = map.targetDistance * map.targetDistance; // magic constant
 
   var localSampler = map.sampler;
 
@@ -68,7 +68,7 @@ function RrtInc(map) {
   function verifyDot(item, edot) {
     var p = item.pos;
     return !hasNear(edot)
-      && !lineChecker.check(localSampler, p, edot, checkResolution, storeResolution, Configuration.lerpTo);
+      && !lineChecker.check(localSampler, p, edot, checkResolution, undefined, Configuration.lerpTo);
   }
 
   function chooseDistRnd(arr) {
@@ -86,7 +86,7 @@ function RrtInc(map) {
     ConfigurationInput.randomize(TEMP_INPUT);
     var dot = Configuration.copyTo(TEMP, item.pos);
     ConfigurationInput.applyIP(dot, TEMP_INPUT);
-    Configuration.copyTo(_this.trial, dot);
+    Configuration.copyTo(_this.conf_trial, dot);
     if (verifyDot(item, dot)) {
       var newItem = putNewItemByPos(dot, item);
       _this.samplesSaved++;
@@ -112,10 +112,11 @@ function RrtInc(map) {
   }
 
   function iterate(sampleCnt) {
-    samples.forEach(function(item) {
-      item.score = itemScore(item);
-    });
-    if (Math.random() < 0.02) {
+    if (Math.random() < 0.002) {
+      for (let i = 0; i < samples.length; i++) {
+        let item = samples[i];
+        item.score = itemScore(item);
+      }
       samples.sort(itemCmp);
     }
     Helper.iterate(_this, putRandomDot, sampleCnt);
@@ -134,8 +135,7 @@ function RrtInc(map) {
     return Helper.pathToRoot(parent, solutionSample, cost, mapToPos);
   }
 
-  this.trial = Configuration.create();
-  this.lastPut = this.trial;
+  this.conf_trial = Configuration.create();
   this.samplesGenerated = 0;
   this.samplesSaved = 0;
   this.continueForever = false;

@@ -1,11 +1,6 @@
 import VecN from '/math/VecN';
 
 const {sqrt} = Math;
-
-function copyarr(a) {
-  return a.slice(0);
-}
-
 function clamp(x, mi, ma) {
   if (x < mi) return mi;
   if (x > ma) return ma;
@@ -14,8 +9,8 @@ function clamp(x, mi, ma) {
 
 export default class NBox {
   constructor(min, max) {
-    this.min = min;
-    this.max = max;
+    this.min = VecN.make(min);
+    this.max = VecN.make(max);
   }
 
   contains(dot) {
@@ -86,8 +81,8 @@ export default class NBox {
     if (ratio === undefined) ratio = 0.25;
     var size = this.size();
     var i;
-    var nmin = copyarr(this.min);
-    var nmax = copyarr(this.max);
+    var nmin = VecN.copy(this.min);
+    var nmax = VecN.copy(this.max);
     for (i = 0; i < size.length; i++) {
       nmin[i] -= size[i] * ratio;
       nmax[i] += size[i] * ratio;

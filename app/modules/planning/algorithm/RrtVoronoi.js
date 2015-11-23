@@ -35,7 +35,6 @@ export default class RrtVoronoi {
     this.conf_gen = this.Configuration.create();
     this.trialDist = 1e50;
 
-    this.lastPut = null;
     this.lineChecker = new Helper.LineChecker(this.Configuration.create());
 
     this.putConfig(map.start, null);
@@ -43,7 +42,7 @@ export default class RrtVoronoi {
 
   putConfig(config, parent) {
     const Configuration = this.Configuration;
-    this.lastPut = config = Configuration.copy(config);
+    config = Configuration.copy(config);
     this.boxTree.putDot(config);
     var len2 = Configuration.dist2(this.myMap.target, config);
     if (len2 < this.targetDistance2) {
@@ -112,7 +111,7 @@ export default class RrtVoronoi {
     var nextDist = Configuration.dist(nextNearest, config_saved);
 
     if (nextDist > myMap.storeResolution) {
-      var hitsWall = this.lineChecker.check(myMap.sampler, nearest, config_saved, myMap.checkResolution, undefined, Configuration.lerp);
+      var hitsWall = this.lineChecker.check(myMap.sampler, nearest, config_saved, myMap.checkResolution, undefined, Configuration.lerpTo);
       if (!hitsWall) {
         goodSample = true;
         this.putConfig(config_saved, nearest);

@@ -29,8 +29,7 @@ module.exports = function(grunt) {
             modules: {
                 src: [
                     'app/lib/require.js',
-                    '.tmp/babel/modules/**/*',
-                    'app/lib/require-index.js'
+                    '.tmp/babel/modules/**/*'
                 ],
                 dest: '.tmp/concat/modules/modules.js',
                 separator: ';\n\n\n'

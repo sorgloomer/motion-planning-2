@@ -2,7 +2,7 @@
  * Created by Hege on 2015.11.23..
  */
 
-import PianoModel from '/experiments_old/experiment/piano2d/PianoModel';
+import PianoModel from '/experiments_old/experiment/common/PianoModel';
 
 export default class PianoSampler {
   constructor(model, config) {

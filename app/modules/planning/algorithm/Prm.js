@@ -21,7 +21,7 @@ function Prm(map) {
 
     var startNode = Configuration.copy(map.target);
     var endNode = Configuration.copy(map.start);
-    const lastPut = Configuration.create();
+    const conf_trial = Configuration.create();
     const lineChecker = new Helper.LineChecker(Configuration.create());
 
 
@@ -42,7 +42,7 @@ function Prm(map) {
         boxTree.putDot(dot);
         samples.push({pos:dot});
 
-        Configuration.copyTo(lastPut, dot);
+        Configuration.copyTo(conf_trial, dot);
 
         boxTree.enumerateInRange(dot, map.connectDistance, function(dotInTree, knownDistance2) {
             var dist = Math.sqrt(knownDistance2);
@@ -90,7 +90,7 @@ function Prm(map) {
     this.edges = edges;
     this.samples = samples;
     this.iterate = iterate;
-    this.lastPut = lastPut;
+    this.conf_trial = conf_trial;
     this.getSolution = getSolution;
 }
 export default Prm;
