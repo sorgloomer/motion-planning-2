@@ -1,3 +1,4 @@
+import Config from '/entry/Config';
 import utils from '/utils/utils';
 import databind from '/utils/databind';
 
@@ -6,29 +7,61 @@ var SCALE = 100;
 var VEC2_ZERO = [0, 0];
 
 
-function CssView(viewmodel, viewportElement) {
+function CssView(viewmodel, viewportElement, model) {
   this.viewmodel = viewmodel;
   this.viewport = viewportElement;
+  this.model = model;
 
-  this.walls = createView(viewmodel.definition.walls, viewportElement, "walls");
+  this.walls = _createView("walls");
+  if (Config.SHOW2D_WALLS) {
+    this.walls = _fillView(this.walls, viewmodel.definition.walls, viewportElement);
+  }
 
-  this.agents = viewmodel.definition.agents.map(function(agentDef) {
-    return createView(agentDef, viewportElement, "agent");
-  });
-  this.agents2 = viewmodel.definition.agents.map(function(agentDef) {
-    return createView(agentDef, viewportElement, "agent2");
-  });
+  var agents = null;
+  if (Config.SHOW2D_AGENT) {
+    agents = viewmodel.definition.agents.map(function(agentDef) {
+      return createView(agentDef, viewportElement, "agent");
+    });
+  } else {
+    agents = [];
+  }
+  this.agents = agents;
 
+  var agents2 = null;
+  if (Config.SHOW2D_AGENT) {
+    agents2 = viewmodel.definition.agents.map(function(agentDef) {
+      return createView(agentDef, viewportElement, "agent2");
+    });
+  } else {
+    agents2 = [];
+  }
+
+  this.agents2 = agents2;
   this.samples = [];
 
-  // this.walls.appendChild(createTree(this.model.wallsTree, "rect"));
+
+  if (Config.SHOW2D_TREE_FULL) {
+    this.walls.appendChild(createTree(this.model.wallsTree, "rect", false));
+  }
+  if (Config.SHOW2D_TREE_PART) {
+    this.walls.appendChild(createTree(this.model.wallsTree, "rect", true));
+  }
 
   this.update();
 }
 
 function createView(def, viewportElement, style) {
+  var view = _createView(style);
+  _fillView(view, def, viewportElement);
+  return view;
+}
+function _createView(style) {
   var view = document.createElement('span');
   view.className = style;
+  return view;
+}
+
+function _fillView(view, def, viewportElement) {
   def.forEach(function(d) {
     var element = document.createElement('span');
     element.className = "box";
@@ -42,16 +75,20 @@ function createView(def, viewportElement, style) {
   return view;
 }
 
+
 function forEach(arr, fn) {
   if (arr) arr.forEach(fn);
 }
+function takeUniform(arr, fn) {
+  if (arr) fn(arr[Math.floor(arr.length * Math.random() - 0.000001)]);
+}
 
-function createTree(tree, style) {
+function createTree(tree, style, single_random) {
   var root = document.createElement('span');
-  drawTree(tree, root, style);
+  drawTree(tree, root, style, single_random);
   return root;
 }
-function drawTree(tree, parent, style) {
+function drawTree(tree, parent, style, single_random) {
   var elements = [];
   function bound(tree) {
     var element = document.createElement('span');
@@ -61,7 +98,12 @@ function drawTree(tree, parent, style) {
     positionElementSim(element, tree.box.placement);
     parent.appendChild(element);
     elements.push(element);
-    forEach(tree.children, bound);
+
+    if (single_random) {
+      takeUniform(tree.children, bound);
+    } else {
+      forEach(tree.children, bound);
+    }
   }
   bound(tree);
   return elements;
@@ -97,7 +139,9 @@ CssView.prototype.update = function update() {
     positionElementSim(arr1[i], arr2[i]);
   }
 
-  databind.updateArray(this.samples, this.viewmodel.samples, SampleDefinition, this);
+  if (Config.SHOW2D_SAMPLES) {
+    databind.updateArray(this.samples, this.viewmodel.samples, SampleDefinition, this);
+  }
 };
 
 CssView.prototype.setHighlighted = function setHighlighted(flag){

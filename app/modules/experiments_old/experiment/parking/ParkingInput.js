@@ -18,6 +18,7 @@ function applyTo(to, config, inp) {
   var nx =  config[2] * cosa + config[3] * sina;
   var ny = -config[2] * sina + config[3] * cosa;
 
+  // car model is rotated by 90 degrees
   to[0] = config[0] + dpos * config[3];
   to[1] = config[1] - dpos * config[2];
   to[2] = nx;

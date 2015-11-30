@@ -14,17 +14,17 @@ export default function PhParkingExperiment() {
   this.model = World;
   this.sampler = new PianoSampler(World, Config);
 
-  this.checkResolution = 0.15;
-  this.storeResolution = 0.15;
-  this.connectDistance = 0.10;
-  this.targetDistance = 0.10;
+  this.checkResolution = 0.10;
+  this.storeResolution = 0.14;
+  this.connectDistance = 0.10; // prm has no meaning here
+  this.targetDistance = 0.23;
 
   this.sampleBounds = new NBox(
     [-0.6, -2, -1.1, -1.1, -10, -10],
     [ 1.0,  2,  1.1,  1.1,  10,  10]
   );
   this.start =  Config.make(0.2, -1.6, 0);
-  this.target = Config.make(1.0, -0.4, 0);
+  this.target = Config.make(1.1, -0.4, 0);
 
   this.Configuration = Config;
   this.ConfigurationInput = Input;

@@ -1,3 +1,4 @@
+import Config from '/entry/Config';
 import BABYLON from '/shim/babylon';
 import { DEG_TO_RAD, PI } from '/utils/math';
 import MeshHelper from '/graphics/MeshHelper';
@@ -33,7 +34,7 @@ class ExperimentScene {
 }
 
 
-function createScene(canvas, engine, model) {
+function createScene(canvas, engine, model, experiment) {
   var scene = new BABYLON.Scene(engine);
   scene.clearColor = new BABYLON.Color3(0.7, 0.9, 1);
   var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 4, -8), scene);
@@ -104,9 +105,16 @@ function createScene(canvas, engine, model) {
   shadowCasters.push(...allObjects);
 
 
+  var tree_world = null;
+  if (Config.SHOW3D_TREE_PART) {
+    tree_world = MeshHelper.meshFromOBoxTreePart(
+      'tree_world', scene,
+      experiment.sampler.worldTree,
+      true,
+      (mesh, node) => mesh.material = mat_wireframe);
+  }
   /*
    const tree_agent = MeshHelper.meshFromOBoxTree('tree_agent', scene, ring2_tree, true, (mesh, node) => mesh.material = mat_wireframe);
-   const tree_world = MeshHelper.meshFromOBoxTree('tree_world', scene, tree1, true, (mesh, node) => mesh.material = mat_wireframe);
    */
 
   [ground].concat(allObjects).forEach(m => { m.receiveShadows = true; });
@@ -128,7 +136,8 @@ export default class BabylonVisual {
     this.engine = new BABYLON.Engine(this.canvas, true);
     this.scene = createScene(
       this.canvas, this.engine,
-      this.experiment.model);
+      this.experiment.model,
+      this.experiment);
     this.startTime = timestamp;
   }
   run(fn) {

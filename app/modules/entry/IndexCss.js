@@ -4,6 +4,7 @@ import NBox from '/math/NBox';
 import CurvedPianoExperiment from '/experiments_old/experiment/curved_piano/CurvedPianoExperiment';
 import ArmExperiment4 from '/experiments_old/experiment/arm/ArmExperiment4';
 import ArmExperiment6 from '/experiments_old/experiment/arm/ArmExperiment6';
+import ArmExperiment12 from '/experiments_old/experiment/arm/ArmExperiment12';
 import ParkingExperiment from '/experiments_old/experiment/parking/ParkingExperiment';
 import PhParkingExperiment from '/experiments_old/experiment/parking_physics/PhParkingExperiment';
 import { default_dict } from '/utils/dicts';
@@ -17,7 +18,8 @@ const EXPERIMENTS = default_dict(CurvedPianoExperiment, {
   park: ParkingExperiment,
   park2: PhParkingExperiment,
   arm4: ArmExperiment4,
-  arm6: ArmExperiment6
+  arm6: ArmExperiment6,
+  arm12: ArmExperiment12
 });
 
 
@@ -39,7 +41,7 @@ function main() {
     viewport = document.getElementById('viewport');
     experiment = new Experiment();
     viewmodel = new CssViewModel(experiment.model, experiment.Configuration);
-    view = new CssView(viewmodel, viewport);
+    view = new CssView(viewmodel, viewport, experiment.sampler.model);
 
     MyConfigSpace = experiment.Configuration;
     config = MyConfigSpace.create();

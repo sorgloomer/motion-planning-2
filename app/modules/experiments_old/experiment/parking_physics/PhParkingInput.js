@@ -1,7 +1,10 @@
 import similar2 from '/math/Sim2';
 import vecn from '/math/VecN';
 
-var DT = 0.1;
+const DT = 0.20;
+
+const ACCELERATION = 1.0;
+const STEERING_SPEED = 3.0;
 
 function rspan(x) {
   return (Math.random() * 2 - 1) * x;
@@ -9,7 +12,7 @@ function rspan(x) {
 
 function randomize(inp) {
   inp[0] = rspan(1.0);
-  inp[1] = rspan(2.0);
+  inp[1] = rspan(1.0);
 }
 
 function applyTo(to, config, inp) {
@@ -21,12 +24,13 @@ function applyTo(to, config, inp) {
   var nx =  config[2] * cosa + config[3] * sina;
   var ny = -config[2] * sina + config[3] * cosa;
 
+  // car model is rotated by 90 degrees
   to[0] = config[0] + dpos * config[3];
   to[1] = config[1] - dpos * config[2];
   to[2] = nx;
   to[3] = ny;
-  to[4] = clamp(config[4] + inp[0] * DT, 1.0);
-  to[5] = clamp(config[5] + inp[1] * DT, 2.4);
+  to[4] = clamp(config[4] + inp[0] * ACCELERATION * DT, 1.0);
+  to[5] = clamp(config[5] + inp[1] * STEERING_SPEED * DT, 2.4);
   return to;
 }
 

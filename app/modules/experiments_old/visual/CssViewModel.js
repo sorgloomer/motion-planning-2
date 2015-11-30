@@ -1,3 +1,4 @@
+import Config from '/entry/Config';
 import databind from '/utils/databind';
 import similar2 from '/math/Sim2';
 
@@ -24,7 +25,7 @@ CssViewModel.prototype.pullSolver = function(solver) {
   var agents = this.agents;
   var agents2 = this.agents2;
 
-  databind.updateArray(this.samples, solver.samples.slice(-1000), SampleBindingDefinition, this);
+  databind.updateArray(this.samples, solver.samples.slice(-Config.SHOW2D_SAMPLE_COUNT), SampleBindingDefinition, this);
 
   if (solver.conf_gen) {
     this.Configuration.loadView(indexer1, solver.conf_gen);

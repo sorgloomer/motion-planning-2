@@ -63,7 +63,24 @@ function meshFromOBoxList(name, scene, oboxes, box_cb = null) {
   }));
 }
 
+function forEach(arr, cb) {
+  arr.forEach(cb);
+}
+function forSingleUniform(arr, cb) {
+  if (arr && arr.length > 0) {
+    cb(arr[Math.floor(arr.length * Math.random() - 0.00001)]);
+  }
+}
+
 function meshFromOBoxTree(name, scene, treeRoot, renderLeaves = false, node_cb = null) {
+  return _meshFromOBoxTree(forEach, name, scene, treeRoot, renderLeaves, node_cb);
+}
+
+function meshFromOBoxTreePart(name, scene, treeRoot, renderLeaves = false, node_cb = null) {
+  return _meshFromOBoxTree(forSingleUniform, name, scene, treeRoot, renderLeaves, node_cb);
+}
+
+function _meshFromOBoxTree(iterate, name, scene, treeRoot, renderLeaves, node_cb) {
   var i = 0;
 
   var children = [];
@@ -73,7 +90,7 @@ function meshFromOBoxTree(name, scene, treeRoot, renderLeaves = false, node_cb =
 
   function visit(node) {
     if (node.children) {
-      node.children.forEach(visit);
+      iterate(node.children, visit);
     }
 
     if (node.children || renderLeaves) {
@@ -111,5 +128,6 @@ export default {
   applyTranslation,
   applyTransform,
   meshFromOBoxList,
-  meshFromOBoxTree
+  meshFromOBoxTree,
+  meshFromOBoxTreePart
 };
