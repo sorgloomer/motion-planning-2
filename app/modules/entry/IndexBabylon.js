@@ -7,12 +7,14 @@ import { ALGORITHMS } from '/entry/Common';
 import VisualModel from '/experiments_new/visual/VisualModel3D';
 import BabylonVisual from '/experiments_new/visual/BabylonVisual';
 
-import Drone1 from '/experiments_new/experiment/drone/DronePiano';
-import Drone2 from '/experiments_new/experiment/drone/DronePhysics';
+import Drone1 from '/experiments_new/experiment/drone/DronePianoExperiment';
+import Drone2 from '/experiments_new/experiment/drone/DronePhysicsExperiment';
+import TestExperiment1 from '/experiments_new/experiment/test/TestExperiment1';
 
 const EXPERIMENTS = default_dict(Drone1, {
   drone1: Drone1,
-  drone2: Drone2
+  drone2: Drone2,
+  test1: TestExperiment1
 });
 
 function main() {

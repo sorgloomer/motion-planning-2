@@ -1,3 +1,4 @@
+import Config from '/entry/Config';
 import Sim3 from '/math/Sim3';
 import lists from '/utils/lists';
 
@@ -22,7 +23,7 @@ export default class VisualModel3D {
 
     this.solution = null;
     this.solution_keyframes = null;
-    this.solution_keyframe_count = 5;
+    this.solution_keyframe_count = Config.SHOW3D_SOLUTION_KEYFRAME_COUNT;
     this.has_solution = false;
     this.solution_length = 0;
   }
