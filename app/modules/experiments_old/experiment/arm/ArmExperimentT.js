@@ -19,6 +19,7 @@ function ArmExperiment(SEGMENTS, SEGMENT_SIZE) {
 
 
   this.storeResolution = 0.20;
+  this.storeResolutionGradient = 0.2;
   this.checkResolution = 0.05;
 
   this.connectDistance = 0.40;

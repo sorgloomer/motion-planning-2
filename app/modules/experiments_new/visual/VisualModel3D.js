@@ -19,7 +19,7 @@ export default class VisualModel3D {
     this.temp_sim = Sim3.create();
     this.temp_configuration = this.experiment.Configuration.create();
     this._iterations = 5;
-    this.iterations_time = 20;
+    this.iterations_time = Config.FRAME_TIME;
 
     this.solution = null;
     this.solution_keyframes = null;

@@ -21,32 +21,38 @@ function choose_random(items) {
   return items[index];
 }
 
-function RrtInc(map) {
+function RrtInc(myMap) {
   var _this = this;
   var samples = this.samples = [];
   var edges = this.edges = [];
 
   const sampleHeap = new Heap();
-  this.map = map;
+  this.map = myMap;
 
-  var quad = new NBoxTree(map.sampleBounds);
+  var rejected_by_crowd_count = 0;
+  var quad = new NBoxTree(myMap.sampleBounds);
   var trialCount = 0;
-  var target = map.target;
-  var Configuration = map.Configuration;
-  var ConfigurationInput = map.ConfigurationInput;
+  var target = myMap.target;
+  var Configuration = myMap.Configuration;
+  var ConfigurationInput = myMap.ConfigurationInput;
 
-  var storeResolution = map.storeResolution;
-  var checkResolution = map.checkResolution;
-  var storeResolution2 = storeResolution * storeResolution;
-  var solutionDistance2 = map.targetDistance * map.targetDistance; // magic constant
+  var storeResolution = myMap.storeResolution;
+  var storeResolutionGradient = myMap.storeResolutionGradient;
 
-  var localSampler = map.sampler;
+  var checkResolution = myMap.checkResolution;
+  var targetDistance = myMap.targetDistance;
+  var targetDistance2 = targetDistance * targetDistance;
+
+  var localSampler = myMap.sampler;
 
   var solutionSample = null;
   var TEMP_INPUT = ConfigurationInput.create();
-  var TEMP = Configuration.create();
+  var TEMP_CONF = Configuration.create();
+  var TEMP_CONF2 = Configuration.create();
 
-  putNewItemByPos(map.start, null);
+  var NEARING_TRIALS = 2;
+
+  putNewItemByPos(myMap.start, null);
 
   function setItemInitialScore(item) {
     item.init_score =
@@ -58,8 +64,9 @@ function RrtInc(map) {
 
   function putNewItemByPos(dot, parent) {
     dot = Configuration.copy(dot);
-    var item = new SampleItem(dot, parent);
     if (putDotInTree(dot)) {
+    // if (myMap.sampleBounds.contains(dot)) {
+      var item = new SampleItem(dot, parent);
 
       setItemInitialScore(item);
       samples.push(item);
@@ -67,36 +74,21 @@ function RrtInc(map) {
       if (parent) {
         edges.push([parent, item]);
       }
+      return item;
+    } else {
+      return null;
     }
-    return item;
   }
-
-  function hasNear(p) {
-    var result = false;
-    function visit(dot) {
-      if (Configuration.dist2(dot, p) < storeResolution2) {
-        result = true;
-      }
-    }
-    quad.traverse(function(node) {
-      if (result || node.sampleBounds.dist2(p) > storeResolution2) {
-        return true;
-      } else {
-        var dots = node.dots;
-        if (dots) {
-          dots.forEach(visit);
-        }
-      }
-    });
-    return result;
-  }
-
 
   const lineChecker = new Helper.LineChecker(Configuration.create());
-  function verifyDot(item, edot) {
+  function verifyDot(item, edot, max_dist) {
     var p = item.pos;
-    return !hasNear(edot)
-      && !lineChecker.check(localSampler, p, edot, checkResolution, undefined, Configuration.lerpTo);
+    if (quad.hasInRange(edot, max_dist)) {
+      rejected_by_crowd_count++;
+      return false;
+    } else {
+      return !lineChecker.check(localSampler, p, edot, checkResolution, undefined, Configuration.lerpTo);
+    }
   }
 
   function chooseByScore() {
@@ -107,22 +99,41 @@ function RrtInc(map) {
     sampleHeap.push(item.score, item);
   }
 
+  function clamp(val, mn, mx) {
+    return Math.max(Math.min(val, mx), mn);
+  }
   function processRandomItem(item) {
-    ConfigurationInput.randomize(TEMP_INPUT);
-    var dot = Configuration.copyTo(TEMP, item.pos);
-    ConfigurationInput.applyIP(dot, TEMP_INPUT);
-    Configuration.copyTo(_this.conf_trial, dot);
-    if (verifyDot(item, dot)) {
-      var newItem = putNewItemByPos(dot, item);
+    var best_conf = null, best_dist = 0;
+    var current_conf = null, current_dist = 0;
+
+    for (var i = 0; i < NEARING_TRIALS; i++) {
+      ConfigurationInput.randomize(TEMP_INPUT);
+      current_conf = Configuration.copyTo(TEMP_CONF, item.pos);
+      ConfigurationInput.applyIP(current_conf, TEMP_INPUT);
+
+      current_dist = Configuration.dist(current_conf, target);
+      var store_res = clamp(targetDistance * 0.5, current_dist * storeResolutionGradient, storeResolution);
+
+      if (verifyDot(item, current_conf, store_res)) {
+        if (!best_conf || current_dist < best_dist) {
+          best_conf = Configuration.copyTo(TEMP_CONF2, current_conf);
+          best_dist = current_dist;
+        }
+      }
+    }
+
+    Configuration.copyTo(_this.conf_trial, best_conf || current_conf);
+    if (best_conf) {
+      var newItem = putNewItemByPos(best_conf, item);
       _this.samplesSaved++;
-      if (Configuration.dist2(dot, target) < solutionDistance2) {
+      if (newItem && best_dist < targetDistance) {
         _this.hasSolution = true;
         solutionSample = newItem;
       }
       item.score += item.init_score * 0.5;
     } else {
       if (_this.wrongSampleCallback) {
-        _this.wrongSampleCallback(dot);
+        _this.wrongSampleCallback(current_conf);
       }
       item.fails++;
       item.score += item.fails * item.init_score;

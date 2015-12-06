@@ -15,9 +15,10 @@ export default function PhParkingExperiment() {
   this.sampler = new PianoSampler(World, Config);
 
   this.checkResolution = 0.10;
-  this.storeResolution = 0.14;
+  this.storeResolution = 0.35;
+  this.storeResolutionGradient = 0.2;
   this.connectDistance = 0.10; // prm has no meaning here
-  this.targetDistance = 0.23;
+  this.targetDistance = 0.22;
 
   this.sampleBounds = new NBox(
     [-0.6, -2, -1.1, -1.1, -10, -10],

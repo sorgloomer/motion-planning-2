@@ -9,6 +9,7 @@ import ParkingExperiment from '/experiments_old/experiment/parking/ParkingExperi
 import PhParkingExperiment from '/experiments_old/experiment/parking_physics/PhParkingExperiment';
 import { default_dict } from '/utils/dicts';
 import { ALGORITHMS } from '/entry/Common';
+import Config from '/entry/Config';
 
 import CssViewModel from '/experiments_old/visual/CssViewModel';
 import CssView from '/experiments_old/visual/CssView';
@@ -61,12 +62,17 @@ function main() {
 
 
   var solT = 0, solSpeed = 0.5;
+
+  function _timedCycle() {
+    var mark = Date.now() + Config.FRAME_TIME;
+    do {
+      solver.iterate();
+    } while(!solver.hasSolution && Date.now() < mark);
+  }
   function cycle() {
 
     if (!solution) {
-      for (var i = 0; i < 50; i++) {
-        solver.iterate();
-      }
+      _timedCycle();
       if (solver.hasSolution) {
         solution = solver.getSolution();
         console.log('solved');
