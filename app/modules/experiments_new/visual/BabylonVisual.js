@@ -156,7 +156,7 @@ export default class BabylonVisual {
       if (!this.scene.agent_keyframes) {
         this.scene.addKeyAgents(model.solution_keyframes, this.experiment.model);
       }
-      model.solutionLerpTo(this.temp_sim, (time / this.solution_loop_time % 1) * model.solution_length);
+      model.solutionLerpTo(this.temp_sim, time * 0.001);
       MeshHelper.applyTransform(this.scene.mesh_agent, this.temp_sim);
     } else {
       MeshHelper.applyTransform(this.scene.mesh_agent, model.agent_transform);

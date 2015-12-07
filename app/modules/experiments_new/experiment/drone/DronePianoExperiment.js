@@ -20,7 +20,8 @@ export default function DroneRingMap() {
   this.model = new DroneRingModel();
 
   this.sampler = new Sampler3D(this.model);
-  this.storeResolution = 0.05; // for all strategies
+  this.storeResolutionMin = 0.02; // for all strategies
+  this.storeResolutionMax = 0.05; // for all strategies
   this.storeResolutionGradient = 0.2;
   this.checkResolution = 0.04; // for all strategies
 

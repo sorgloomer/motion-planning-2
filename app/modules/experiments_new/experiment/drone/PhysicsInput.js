@@ -107,6 +107,9 @@ function applyIP(config, action, opt_dt) {
   return applyTo(config, config, action, opt_dt);
 }
 
+function costOf(inp) {
+  return inp[4];
+}
 export default {
-  create, randomize, applyTo, applyIP
+  create, randomize, applyTo, applyIP, costOf
 };

@@ -13,6 +13,7 @@ import Config from '/entry/Config';
 
 import CssViewModel from '/experiments_old/visual/CssViewModel';
 import CssView from '/experiments_old/visual/CssView';
+import AnimationHelper from '/entry/AnimationHelper';
 
 const EXPERIMENTS = default_dict(CurvedPianoExperiment, {
   curved: CurvedPianoExperiment,
@@ -34,7 +35,7 @@ function main() {
   var view, viewport, viewmodel;
 
   var MyConfigSpace = null;
-  var config = null, config2 = null;
+  var config = null;
   var experiment, solver, solution;
   var animationTotal = 0;
 
@@ -47,7 +48,6 @@ function main() {
 
     MyConfigSpace = experiment.Configuration;
     config = MyConfigSpace.create();
-    config2 = MyConfigSpace.create();
   }
 
 
@@ -62,42 +62,7 @@ function main() {
   }
 
 
-  function _bin_search(items, selector, value, left, right) {
-    for (;;) {
-      if (left > right) return right;
-      const midi = Math.floor((left + right) / 2);
-      const midval = selector(items[midi]);
-      if (value >= midval) {
-        left = midi + 1;
-      } else {
-        right = midi - 1;
-      }
-    }
-  }
-  function time_bin_search(items, time) {
-    return _bin_search(items, x => x.cost, time, 0, items.length - 1);
-  }
 
-  function clamp_to_index(i, arr) {
-    return Math.max(0, Math.min(i, arr.length - 1));
-  }
-  function process_animation() {
-    var animT = Math.min((Date.now() * 0.002) % (animationTotal + 2), animationTotal);
-    var solution_path = solution.path;
-    var anim_index = time_bin_search(solution_path, animT);
-    var anim_index0 = clamp_to_index(anim_index, solution_path);
-    var anim_index1 = clamp_to_index(anim_index + 1, solution_path);
-    var p0 = solution_path[anim_index0];
-    var p1 = solution_path[anim_index1];
-
-    if (p1.cost > p0.cost) {
-      MyConfigSpace.copyTo(config, p0.config);
-      MyConfigSpace.copyTo(config2, p1.config);
-      MyConfigSpace.lerpTo(config, config, config2, (animT - p0.cost) / (p1.cost - p0.cost));
-    } else {
-      MyConfigSpace.copyTo(config, p0.config);
-    }
-  }
   function _timedCycle() {
     var mark = Date.now() + Config.FRAME_TIME;
     do {
@@ -123,7 +88,7 @@ function main() {
       */
 
     } else {
-      process_animation();
+      AnimationHelper.process_animation(config, animationTotal, solution, MyConfigSpace);
       viewmodel.pullAnim(solver, config, MyConfigSpace);
     }
 

@@ -1,12 +1,16 @@
 import Config from '/entry/Config';
 import Sim3 from '/math/Sim3';
 import lists from '/utils/lists';
+import AnimationHelper from '/entry/AnimationHelper';
 
+
+function last(arr) {
+  return arr[arr.length-1];
+}
 function _solutionLerpTo(toSim, experiment, tempConf, solution, time) {
-  const integ = Math.floor(time);
-  const frac = time - integ;
-  const index = integ % (solution.path.length - 1);
-  experiment.Configuration.lerpTo(tempConf, solution.path[index], solution.path[index + 1], frac);
+  var solution_path = solution.path;
+  var animationTotal = last(solution_path).cost;
+  AnimationHelper.process_animation_at(tempConf, time % (animationTotal + 1), solution, experiment.Configuration);
   experiment.Configuration.to_sim3(toSim, tempConf);
   return toSim;
 }

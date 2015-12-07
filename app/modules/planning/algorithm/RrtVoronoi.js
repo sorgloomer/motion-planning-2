@@ -12,6 +12,12 @@ class SampleItem {
     this.cost = cost;
   }
 }
+
+function clamp(val, mn, mx) {
+  return Math.max(Math.min(val, mx), mn);
+}
+
+
 export default class RrtVoronoi {
   constructor(map) {
 
@@ -119,7 +125,9 @@ export default class RrtVoronoi {
     var nextNearest = this.boxTree.nearest(config_saved);
     var nextDist = Configuration.dist(nextNearest, config_saved);
 
-    if (nextDist > myMap.storeResolutionMax) {
+
+    var store_res = clamp(saved_dist * myMap.storeResolutionGradient, myMap.storeResolutionMin, myMap.storeResolutionMax);
+    if (nextDist > store_res) {
       var hitsWall = this.lineChecker.check(myMap.sampler, nearest, config_saved, myMap.checkResolution, undefined, Configuration.lerpTo);
       if (!hitsWall) {
         goodSample = true;
