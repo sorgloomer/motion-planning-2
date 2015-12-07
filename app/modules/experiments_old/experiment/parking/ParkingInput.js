@@ -34,7 +34,10 @@ function create() {
   return new Float64Array(2);
 }
 
+function costOf(inp) {
+  return 0.25;
+}
 export default {
-  create, randomize, applyTo, applyIP
+  create, randomize, applyTo, applyIP, costOf
 };
 

@@ -20,7 +20,7 @@ const ROTATION_TORQUE_Y = ROTATION_TORQUE * 0.1;
 const MOMENT_OF_INERTIA = 5.0;
 
 function create() {
-  return new Float64Array(4);
+  return new Float64Array(5);
 }
 
 function _store_quat(arr, idx, quat) {
@@ -54,13 +54,15 @@ function randomize(c = create()) {
   c[1] *= ROTATION_TORQUE;
   c[2] *= ROTATION_TORQUE_Y; // Torque around selfY axis
   c[3] *= ROTATION_TORQUE;
+  c[4] = 0.2 + random() * 1.8; // dt
   return c;
 }
 
 
 
-function applyTo(dest, config, action, dt = 0.5) {
+function applyTo(dest, config, action) {
 
+  const dt = action[4];
   // load previous orientation
   _load_quat(config, 6, temp_quat1);
   QuatEtc.quat_to_sim(temp_sim1, temp_quat1);

@@ -1,7 +1,6 @@
 import similar2 from '/math/Sim2';
 import vecn from '/math/VecN';
 
-const DT = 0.20;
 
 const ACCELERATION = 1.0;
 const STEERING_SPEED = 3.0;
@@ -13,9 +12,11 @@ function rspan(x) {
 function randomize(inp) {
   inp[0] = rspan(1.0);
   inp[1] = rspan(1.0);
+  inp[2] = 0.1 + Math.random() * 0.3;
 }
 
 function applyTo(to, config, inp) {
+  var DT = inp[2];
   var dpos = config[4] * DT;
 
   var a = dpos * config[5];
@@ -45,10 +46,14 @@ function clamp(a, x) {
 }
 
 function create() {
-  return vecn.create(2);
+  return vecn.create(3);
 }
 
+function costOf(inp) {
+  return inp[2];
+}
 export default {
   create, randomize,
+  costOf,
   applyTo, applyIP
 };

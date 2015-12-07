@@ -2,6 +2,8 @@ import Vec3 from '/math/Vec3';
 
 const { sqrt, acos, sin, cos } = Math;
 
+const EPS = 1e-5;
+
 function create() {
   return new Float64Array(4);
 }
@@ -158,7 +160,11 @@ function setAxisAngleVA(to, v, ang) {
 
 function setEulerScaleXYZS(to, x, y, z, s) {
   const l = Vec3.lenXYZ(x, y, z);
-  return setAxisAngleXYZA(to, x/l, y/l, z/l, s * l);
+  if (l < EPS) {
+    return setIdentity(to);
+  } else {
+    return setAxisAngleXYZA(to, x / l, y / l, z / l, s * l);
+  }
 }
 function setEulerXYZ(to, x, y, z) {
   return setEulerScaleXYZS(to, x, y, z, 1);

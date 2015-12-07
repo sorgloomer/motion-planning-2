@@ -14,8 +14,9 @@ export default function ParkingExperiment() {
   this.model = World;
   this.sampler = new Sampler2D(World, Config);
 
+  this.storeResolutionMin = 0.01;
+  this.storeResolutionMax = 0.06;
   this.storeResolutionGradient = 0.2;
-  this.storeResolution = 0.03;
   this.checkResolution = 0.01;
   this.connectDistance = 0.12;
   this.targetDistance = 0.05;

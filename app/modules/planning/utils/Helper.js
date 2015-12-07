@@ -34,27 +34,18 @@ function identity(x) {
     return x;
 }
 
-function pathToRoot(parentMap, aNode, costFn, mapperFn) {
-    var parentFn = parentMap;
-    if (typeof parentMap !== 'function') {
-        parentFn = function(item) {
-            return parentMap.get(item)
-        };
-    }
-    if (mapperFn === undefined) mapperFn = identity;
+function pathToRoot(parentMap, aNode, costFn, mapperFn = identity) {
     var p = aNode;
     if (p) {
         var path = [];
-        var totalLength = 0;
         for(;;) {
             path.unshift(mapperFn(p));
-            var parent = parentFn(p);
+            var parent = parentMap.get(p);
             if (!parent) break;
-            totalLength += costFn(p, parent);
             p = parent;
         }
         return {
-            cost: totalLength,
+            cost: costFn(aNode),
             path: path
         };
     } else {

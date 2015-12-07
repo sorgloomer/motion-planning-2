@@ -5,6 +5,8 @@ import Helper from '/planning/utils/Helper';
 import UnionFind from '/algorithm/UnionFind';
 import MultiMap from '/algorithm/MultiMap';
 
+import ConfigCost from '/planning/utils/ConfigCost';
+
 
 const FINE_TUNING_COEFF = 20;
 
@@ -62,7 +64,7 @@ function Prm(map) {
         var goodSample = false;
         if (nearest) {
             var knownDistance = Configuration.dist(nearest, newDot);
-            if (knownDistance > map.storeResolution) {
+            if (knownDistance > map.storeResolutionMax) {
                 if (!map.sampler.sample(newDot)) {
                     goodSample = true;
                     putDot(newDot, nearest);
@@ -79,8 +81,14 @@ function Prm(map) {
     }
 
     function getSolution() {
-        var parentMap = Helper.dijkstra(startNode, endNode, neighboursMap, Configuration.dist);
-        return Helper.pathToRoot(parentMap, endNode, Configuration.dist);
+        var parentMap = Helper.dijkstra(endNode, startNode, neighboursMap, Configuration.dist);
+        var result = Helper.pathToRoot(parentMap, startNode, () => 0.2, dot => new ConfigCost(dot, 0));
+        var result_path = result.path;
+        for (var i = 1; i < result_path.length; i++) {
+            result_path[i].cost = result_path[i-1].cost + Configuration.dist(result_path[i-1].config, result_path[i].config);
+        }
+        result.cost = result_path[result_path.length - 1].cost;
+        return result;
     }
 
     this.samplesGenerated = 0;

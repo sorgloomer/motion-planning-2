@@ -9,7 +9,8 @@ function CurvedPianoExperiment() {
 
   this.sampler = new PianoSampler(CurvedWorld, CurvedPianoConfig);
 
-  this.storeResolution = 0.15;
+  this.storeResolutionMin = 0.05;
+  this.storeResolutionMax = 0.15;
   this.storeResolutionGradient = 0.2;
   this.checkResolution = 0.05;
 

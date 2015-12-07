@@ -57,8 +57,11 @@ function lerp(to, a, b, t) {
 }
 
 
+function costOf(inp) {
+  return 0.2;
+}
 
 export default {
-  create, applyTo, applyIP, randomize
+  create, applyTo, applyIP, randomize, costOf
 };
 

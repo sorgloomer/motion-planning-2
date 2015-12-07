@@ -18,12 +18,13 @@ function ArmExperiment(SEGMENTS, SEGMENT_SIZE) {
   this.sampler = new Sampler2D(World, Config);
 
 
-  this.storeResolution = 0.20;
+  this.storeResolutionMin = 0.10;
+  this.storeResolutionMax = 0.20;
   this.storeResolutionGradient = 0.2;
   this.checkResolution = 0.05;
 
   this.connectDistance = 0.40;
-  this.targetDistance = 0.30;
+  this.targetDistance = 0.20;
 
   this.sampleBounds = new NBox(
     utils.times(SEGMENTS, -1),

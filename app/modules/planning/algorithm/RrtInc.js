@@ -2,6 +2,7 @@ import Heap from '/algorithm/Heap';
 import NBox from '/math/NBox';
 import NBoxTree from '/math/NBoxTree';
 import Helper from '/planning/utils/Helper';
+import ConfigCost from '/planning/utils/ConfigCost';
 import { comparerByField } from '/utils/order';
 
 var itemCmp = comparerByField("score");
@@ -10,6 +11,7 @@ function SampleItem(pos, parent) {
   this.pos = pos;
   this.fails = 0;
   this.parent = parent;
+  this.cost = 0;
   this.score = 0;
   this.fails = 0;
   this.path_length = parent ? parent.path_length + 1 : 0;
@@ -36,7 +38,8 @@ function RrtInc(myMap) {
   var Configuration = myMap.Configuration;
   var ConfigurationInput = myMap.ConfigurationInput;
 
-  var storeResolution = myMap.storeResolution;
+  var storeResolutionMin = myMap.storeResolutionMin;
+  var storeResolutionMax = myMap.storeResolutionMax;
   var storeResolutionGradient = myMap.storeResolutionGradient;
 
   var checkResolution = myMap.checkResolution;
@@ -52,7 +55,7 @@ function RrtInc(myMap) {
 
   var NEARING_TRIALS = 2;
 
-  putNewItemByPos(myMap.start, null);
+  putNewItemByPosAndDCost(myMap.start, null, 0);
 
   function setItemInitialScore(item) {
     item.init_score =
@@ -62,11 +65,12 @@ function RrtInc(myMap) {
   }
 
 
-  function putNewItemByPos(dot, parent) {
+  function putNewItemByPosAndDCost(dot, parent, dcost) {
     dot = Configuration.copy(dot);
     if (putDotInTree(dot)) {
     // if (myMap.sampleBounds.contains(dot)) {
       var item = new SampleItem(dot, parent);
+      item.cost = (parent ? parent.cost : 0) + dcost;
 
       setItemInitialScore(item);
       samples.push(item);
@@ -103,7 +107,7 @@ function RrtInc(myMap) {
     return Math.max(Math.min(val, mx), mn);
   }
   function processRandomItem(item) {
-    var best_conf = null, best_dist = 0;
+    var best_conf = null, best_dist = 0, best_dt = 0;
     var current_conf = null, current_dist = 0;
 
     for (var i = 0; i < NEARING_TRIALS; i++) {
@@ -112,19 +116,20 @@ function RrtInc(myMap) {
       ConfigurationInput.applyIP(current_conf, TEMP_INPUT);
 
       current_dist = Configuration.dist(current_conf, target);
-      var store_res = clamp(targetDistance * 0.5, current_dist * storeResolutionGradient, storeResolution);
+      var store_res = clamp(current_dist * storeResolutionGradient, storeResolutionMin, storeResolutionMax);
 
       if (verifyDot(item, current_conf, store_res)) {
         if (!best_conf || current_dist < best_dist) {
           best_conf = Configuration.copyTo(TEMP_CONF2, current_conf);
           best_dist = current_dist;
+          best_dt = ConfigurationInput.costOf(TEMP_INPUT);
         }
       }
     }
 
     Configuration.copyTo(_this.conf_trial, best_conf || current_conf);
     if (best_conf) {
-      var newItem = putNewItemByPos(best_conf, item);
+      var newItem = putNewItemByPosAndDCost(best_conf, item, best_dt);
       _this.samplesSaved++;
       if (newItem && best_dist < targetDistance) {
         _this.hasSolution = true;
@@ -161,16 +166,12 @@ function RrtInc(myMap) {
   }
 
   function getSolution() {
-    function parent(item) {
-      return item.parent;
-    }
-    function cost(a, b) {
-      return Configuration.dist(a.pos, b.pos);
-    }
-    function mapToPos(item) {
-      return item.pos;
-    }
-    return Helper.pathToRoot(parent, solutionSample, cost, mapToPos);
+    return Helper.pathToRoot(
+      { get: item => item.parent },
+      solutionSample,
+      i => i.cost,
+      item => new ConfigCost(item.pos, item.cost)
+    );
   }
 
   this.conf_trial = Configuration.create();

@@ -1,4 +1,4 @@
-var DT = 0.2;
+var DT = 0.3;
 
 export default function(SEGMENTS) {
 
@@ -24,8 +24,12 @@ export default function(SEGMENTS) {
     return new Float64Array(SEGMENTS);
   }
 
+  function costOf(inp) {
+    return DT;
+  }
   return {
     create, randomize,
-    applyIP, applyTo
+    applyIP, applyTo,
+    costOf
   };
 }
