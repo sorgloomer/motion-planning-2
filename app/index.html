@@ -1,16 +1,76 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.css">
 </head>
 <body>
 
-  <div id="main-area">
-    <canvas id="render-canvas" width="1000" height="750">
-    </canvas>
-  </div>
+<div class="container">
+
+  <div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Experiments</div>
+
+    <!-- Table -->
+    <table class="table">
+      <tr>
+        <th></th>
+        <th>Rrt Inc</th>
+        <th>Rrt Voronoi</th>
+        <th>Prm</th>
+      </tr>
+      <tr>
+        <td>2D curved piano</td>
+        <td><a href="experiment-2d.html?alg=rrt_inc&exp=curved">go</a></td>
+        <td><a href="experiment-2d.html?alg=rrt_voronoi&exp=curved">go</a></td>
+        <td><a href="experiment-2d.html?alg=prm&exp=curved">go</a></td>
+      </tr>
+      <tr>
+        <td>2D parking</td>
+        <td><a href="experiment-2d.html?alg=rrt_inc&exp=park">go</a></td>
+        <td><a href="experiment-2d.html?alg=rrt_voronoi&exp=park">go</a></td>
+        <td><a href="experiment-2d.html?alg=prm&exp=park">go</a></td>
+      </tr>
+      <tr>
+        <td>2D parking with physics</td>
+        <td><a href="experiment-2d.html?alg=rrt_inc&exp=park2">go</a></td>
+        <td><a href="experiment-2d.html?alg=rrt_voronoi&exp=park2">go</a></td>
+        <td><a href="experiment-2d.html?alg=prm&exp=park2">go</a></td>
+      </tr>
+      <tr>
+        <td>2D robotic arm 4 segments</td>
+        <td><a href="experiment-2d.html?alg=rrt_inc&exp=arm4">go</a></td>
+        <td><a href="experiment-2d.html?alg=rrt_voronoi&exp=arm4">go</a></td>
+        <td><a href="experiment-2d.html?alg=prm&exp=arm4">go</a></td>
+      </tr>
+      <tr>
+        <td>2D robotic arm 6 segments</td>
+        <td><a href="experiment-2d.html?alg=rrt_inc&exp=arm6">go</a></td>
+        <td><a href="experiment-2d.html?alg=rrt_voronoi&exp=arm6">go</a></td>
+        <td><a href="experiment-2d.html?alg=prm&exp=arm6">go</a></td>
+      </tr>
+      <tr>
+        <td>2D robotic arm 12 segments</td>
+        <td><a href="experiment-2d.html?alg=rrt_inc&exp=arm12">go</a></td>
+        <td><a href="experiment-2d.html?alg=rrt_voronoi&exp=arm12">go</a></td>
+        <td><a href="experiment-2d.html?alg=prm&exp=arm12">go</a></td>
+      </tr>
+      <tr>
+        <td>3D drone</td>
+        <td><a href="experiment-3d.html?alg=rrt_inc&exp=drone">go</a></td>
+        <td><a href="experiment-3d.html?alg=rrt_voronoi&exp=drone">go</a></td>
+        <td><a href="experiment-3d.html?alg=prm&exp=drone">go</a></td>
+      </tr>
+      <tr>
+        <td>3D drone with physics</td>
+        <td><a href="experiment-3d.html?alg=rrt_inc&exp=drone2">go</a></td>
+        <td><a href="experiment-3d.html?alg=rrt_voronoi&exp=drone2">go</a></td>
+        <td><a href="experiment-3d.html?alg=prm&exp=drone2">go</a></td>
+      </tr>
+    </table>
+  </div></div>
 
 
-  <script src="lib/babylon.2.2.max.js"></script>
-  <script src="modules.js"></script>
+
 </body>
 </html>
