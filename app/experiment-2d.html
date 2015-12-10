@@ -12,6 +12,32 @@
       height: 600px;
       overflow: hidden;
     }
+    #main-container {
+      margin-left: auto;
+      margin-right: auto;
+      width: 800px;
+    }
+
+    #main-container table {
+      text-align: right;
+    }
+    .data-meter th, .data-meter td {
+      width: 120px;
+    }
+
+    .data-table {
+      border-spacing: 0;
+      border-collapse: collapse;
+      border: solid black;
+      border-width: 0 0 1px 1px;
+    }
+    .data-table td, .data-table th {
+      border: solid black;
+    }
+    .data-table td, .data-table th {
+      width: 120px;
+      border-width: 1px 1px 0 0;
+    }
 
     #viewport {
       display: block;
@@ -73,11 +99,28 @@
 </head>
 <body>
 
-<div id="main-area" onclick="restart();">
-  <div id="viewport">
+<div id="main-container">
+  <div id="main-area">
+    <div id="viewport">
+    </div>
+  </div>
+  <div id="data-container">
+    <table class="data-meter">
+      <tr>
+        <th>Time:</th>
+        <td id="data-time"></td>
+      </tr>
+      <tr>
+        <th>Samples:</th>
+        <td id="data-samples"></td>
+      </tr>
+      <tr>
+        <th>Storage:</th>
+        <td id="data-storage"></td>
+      </tr>
+    </table>
   </div>
 </div>
-
 <script src="lib/babylon.2.2.max.js"></script>
 <script src="modules.js"></script>
 <script src="js/index-2d.js"></script>

@@ -10,6 +10,9 @@ export default class PianoSampler {
     this.model = new PianoModel(model);
     this.samplesTook = 0;
   }
+  restart() {
+    this.samplesTook = 0;
+  }
   sample(dot) {
     const model = this.model;
     this.samplesTook++;

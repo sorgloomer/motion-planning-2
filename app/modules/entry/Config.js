@@ -4,6 +4,8 @@ const DEBUG = false;
 const RELEASE = true;
 
 export default {
+  MEASURE_SOLVING_TIMEOUT: 60,
+
   SHOW2D_SAMPLE_COUNT: 500,
 
   SHOW2D_TREE_FULL: false,
