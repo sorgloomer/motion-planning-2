@@ -106,6 +106,7 @@ function RrtInc(myMap) {
   function clamp(val, mn, mx) {
     return Math.max(Math.min(val, mx), mn);
   }
+  var best_best_dist = 1000;
   function processRandomItem(item) {
     var best_conf = null, best_dist = 0, best_dt = 0;
     var current_conf = null, current_dist = 0;
@@ -129,6 +130,8 @@ function RrtInc(myMap) {
 
     Configuration.copyTo(_this.conf_trial, best_conf || current_conf);
     if (best_conf) {
+      best_best_dist = Math.min(best_best_dist, best_dist);
+      // console.log(best_best_dist);
       var newItem = putNewItemByPosAndDCost(best_conf, item, best_dt);
       _this.samplesSaved++;
       if (newItem && best_dist < targetDistance) {

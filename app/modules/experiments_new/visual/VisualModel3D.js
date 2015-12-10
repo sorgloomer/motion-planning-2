@@ -56,7 +56,7 @@ export default class VisualModel3D {
     this.solution = solution;
 
     const COUNT = this.solution_keyframe_count;
-    const FULL_TIME = solution.path.length - 1.0001;
+    const FULL_TIME = solution.path[solution.path.length - 1].cost;
 
     this.solution_keyframes = lists.generate(
       COUNT, i => _solutionLerpTo(
