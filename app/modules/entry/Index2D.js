@@ -8,8 +8,10 @@ import ArmExperiment12 from '/experiments_old/experiment/arm/ArmExperiment12';
 import ParkingExperiment from '/experiments_old/experiment/parking/ParkingExperiment';
 import PhParkingExperiment from '/experiments_old/experiment/parking_physics/PhParkingExperiment';
 import { default_dict } from '/utils/dicts';
+import MeasureHelper from '/utils/MeasureHelper';
 import { ALGORITHMS } from '/entry/Common';
 import Config from '/entry/Config';
+import DataContainer from '/view/DataContainer';
 
 import CssViewModel from '/experiments_old/visual/CssViewModel';
 import CssView from '/experiments_old/visual/CssView';
@@ -39,21 +41,53 @@ function main() {
   var experiment, solver, solution;
   var animationTotal = 0;
 
+  var measurer = null;
+  var current_measure = null;
+
+  var measure_restart = !!params.get('measure');
+
+  function measureSample() {
+    return {
+      samples: experiment.sampler.samplesTook,
+      storage: solver.samples.length,
+      cost: solution ? solution.cost : 0
+    };
+  }
+
+  function setupMeasure() {
+    measurer = new MeasureHelper(measureSample);
+    current_measure = measurer.start();
+  }
+
+
 
   function setupModel() {
     viewport = document.getElementById('viewport');
     experiment = new Experiment();
+    MyConfigSpace = experiment.Configuration;
+
+    setupView();
+
+    config = MyConfigSpace.create();
+  }
+
+  function setupView() {
     viewmodel = new CssViewModel(experiment.model, experiment.Configuration);
     view = new CssView(viewmodel, viewport, experiment.sampler.model);
-
-    MyConfigSpace = experiment.Configuration;
-    config = MyConfigSpace.create();
+  }
+  function teardownView() {
+    view.dispose();
   }
 
 
   function restart() {
     totalTime = 0;
-    experiment = new Experiment();
+    solution = null;
+    experiment.sampler.restart();
+    solver = new SelectedAlgorithm(experiment);
+    teardownView();
+    setupView();
+    startMeasureSafe();
   }
 
 
@@ -61,6 +95,9 @@ function main() {
     return (a && a.length > 0) ? a[a.length - 1] : def;
   }
 
+  function restartLater() {
+    setTimeout(restart, 10);
+  }
 
 
   function _timedCycle() {
@@ -69,15 +106,52 @@ function main() {
       solver.iterate();
     } while(!solver.hasSolution && Date.now() < mark);
   }
+
+  function onSolution() {
+    solution = solver.getSolution();
+    animationTotal = last(solution.path).cost;
+    console.log('solved');
+    console.log(solution);
+
+    update_measure_viewmodel();
+
+    const measurement = current_measure.end();
+
+    DataContainer.appendDataToTable(measurement);
+    if (measure_restart) {
+      restartLater();
+    }
+  }
+
+  var shown_measurement = {
+    time: 0,
+    samples: 0,
+    storage: 0
+  };
+
+  function update_measure_viewmodel() {
+    current_measure.inspectTo(shown_measurement);
+  }
+
   function cycle() {
+
+    var elapsedTimespan = current_measure.timespan();
+
+    update_measure_viewmodel();
+    DataContainer.setCurrentData(shown_measurement);
+
+    if (measure_restart && elapsedTimespan > Config.MEASURE_SOLVING_TIMEOUT) {
+      const measurement = current_measure.endTimeout();
+      DataContainer.appendDataToTable(measurement);
+      console.log('timeout');
+      current_measure = null;
+      restartLater();
+    }
 
     if (!solution) {
       _timedCycle();
       if (solver.hasSolution) {
-        solution = solver.getSolution();
-        animationTotal = last(solution.path).cost;
-        console.log('solved');
-        console.log(solution);
+        onSolution();
       }
 
       viewmodel.pullSolver(solver, MyConfigSpace);
@@ -96,12 +170,13 @@ function main() {
     view.update();
   }
 
-
   function startUp() {
     setupModel();
+    setupMeasure();
     scheduleCycle();
 
     solver = new SelectedAlgorithm(experiment);
+    startMeasureSafe();
   }
 
 
@@ -111,6 +186,10 @@ function main() {
   }
   function scheduleCycle() {
     setTimeout(cycleIteration, 50);
+  }
+
+  function startMeasureSafe() {
+    current_measure = measurer.start();
   }
 
   startUp();

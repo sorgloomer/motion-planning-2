@@ -154,6 +154,16 @@ CssView.prototype.setHighlighted = function setHighlighted(flag){
   });
 };
 
+function removeChildren(myNode) {
+  while (myNode.firstChild) {
+    myNode.removeChild(myNode.firstChild);
+  }
+}
+
+CssView.prototype.dispose = function () {
+  removeChildren(this.viewport);
+};
+
 function cssMatrix(x, y, angle) {
   var ca = Math.cos(angle), sa = Math.sin(angle);
   return "matrix("
