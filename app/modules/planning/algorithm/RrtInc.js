@@ -57,6 +57,7 @@ function RrtInc(myMap) {
   var NEARING_TRIALS = 2;
 
   var best_best_dist = Configuration.dist(myMap.start, target);
+  var greediness = 0.5;
 
   putNewItemByPosAndDCost(myMap.start, null, 0);
 
@@ -175,7 +176,7 @@ function RrtInc(myMap) {
 
   function putRandomDot() {
     trialCount++;
-    if (Math.random() < 0.5) {
+    if (Math.random() < greediness) {
       var item = chooseByScore();
       processRandomItem(item);
       putItemToHeap(item);

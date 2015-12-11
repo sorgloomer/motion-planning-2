@@ -74,7 +74,10 @@ export default class VisualModel3D {
   update() {
     if (!this.has_solution) {
 
-      if (this.current_measure.timespan() > Config.MEASURE_SOLVING_TIMEOUT) {
+      if (
+        this.measuring
+        && this.current_measure.timespan() > Config.MEASURE_SOLVING_TIMEOUT
+      ) {
         this._emit(this.current_measure.endTimeout());
         this.restart();
       } else {
