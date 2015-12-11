@@ -56,12 +56,12 @@ function RrtInc(myMap) {
 
   var NEARING_TRIALS = 2;
 
+  var best_best_dist = Configuration.dist(myMap.start, target);
+
   putNewItemByPosAndDCost(myMap.start, null, 0);
 
   function setItemInitialScore(item) {
-    item.init_score =
-      Math.pow(Configuration.dist(item.pos, target), 1.2) * 2
-      + Math.pow(item.path_length, 1.1) * 0.05;
+    itemProcessInitScore(item);
     item.score = item.init_score * 5;
   }
 
@@ -70,6 +70,13 @@ function RrtInc(myMap) {
     dot = Configuration.copy(dot);
     if (putDotInTree(dot)) {
     // if (myMap.sampleBounds.contains(dot)) {
+
+      var best_dist = Configuration.dist(dot, target);
+      best_best_dist = Math.min(best_best_dist, best_dist);
+      if (Config.DEBUG_GREEDY) {
+        console.log('nearest: ' + best_best_dist);
+      }
+
       var item = new SampleItem(dot, parent);
       item.cost = (parent ? parent.cost : 0) + dcost;
 
@@ -107,7 +114,23 @@ function RrtInc(myMap) {
   function clamp(val, mn, mx) {
     return Math.max(Math.min(val, mx), mn);
   }
-  var best_best_dist = 1000;
+
+  function itemProcessInitScore(item) {
+    item.init_score =
+      (Configuration.dist(item.pos, target) - best_best_dist) * 2
+      + Math.pow(item.path_length, 1.1) * 0.05;
+  }
+  function itemUpdateSuccess(item) {
+    itemProcessInitScore(item);
+    item.score += item.init_score * 0.5;
+  }
+
+  function itemUpdateFail(item) {
+    itemProcessInitScore(item);
+    item.fails++;
+    item.score += item.fails * (item.init_score + 1);
+  }
+
   function processRandomItem(item) {
     var best_conf = null, best_dist = 0, best_dt = 0;
     var current_conf = null, current_dist = 0;
@@ -131,23 +154,22 @@ function RrtInc(myMap) {
 
     Configuration.copyTo(_this.conf_trial, best_conf || current_conf);
     if (best_conf) {
-      best_best_dist = Math.min(best_best_dist, best_dist);
-      if (Config.DEBUG_GREEDY) {
-        console.log('nearest: ' + best_best_dist);
-      }
-      var newItem = putNewItemByPosAndDCost(best_conf, item, best_dt);
+      var newItem = putNewItemByPosAndDCost(best_conf, item, best_dt, best_dist);
       _this.samplesSaved++;
-      if (newItem && best_dist < targetDistance) {
-        _this.hasSolution = true;
-        solutionSample = newItem;
+
+      if (newItem) {
+        if (best_dist < targetDistance) {
+          _this.hasSolution = true;
+          solutionSample = newItem;
+        }
       }
-      item.score += item.init_score * 0.5;
+
+      itemUpdateSuccess(item);
     } else {
       if (_this.wrongSampleCallback) {
         _this.wrongSampleCallback(current_conf);
       }
-      item.fails++;
-      item.score += item.fails * item.init_score;
+      itemUpdateFail(item);
     }
   }
 

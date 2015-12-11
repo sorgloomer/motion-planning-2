@@ -132,7 +132,11 @@ export default class BabylonVisual {
     this.temp_sim = Sim3.create();
     this.solution_loop_time = 7500;
     this.viewmodel = viewmodel;
-    viewmodel.onData = DataContainer.appendDataToTable;
+    viewmodel.onData = data => {
+      // if (viewmodel.measuring) {
+        DataContainer.appendDataToTable(data);
+      //}
+    };
   }
 
   init(timestamp) {

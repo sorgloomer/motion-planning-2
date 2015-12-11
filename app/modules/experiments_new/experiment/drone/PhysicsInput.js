@@ -54,7 +54,7 @@ function randomize(c = create()) {
   c[1] *= ROTATION_TORQUE;
   c[2] *= ROTATION_TORQUE_Y; // Torque around selfY axis
   c[3] *= ROTATION_TORQUE;
-  c[4] = 0.1 + random() * 0.9; // dt
+  c[4] = 0.1 + random() * 1.9; // dt
   return c;
 }
 
