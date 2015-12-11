@@ -1,3 +1,4 @@
+import Config from '/entry/Config';
 import Heap from '/algorithm/Heap';
 import NBox from '/math/NBox';
 import NBoxTree from '/math/NBoxTree';
@@ -131,7 +132,9 @@ function RrtInc(myMap) {
     Configuration.copyTo(_this.conf_trial, best_conf || current_conf);
     if (best_conf) {
       best_best_dist = Math.min(best_best_dist, best_dist);
-      // console.log(best_best_dist);
+      if (Config.DEBUG_GREEDY) {
+        console.log('nearest: ' + best_best_dist);
+      }
       var newItem = putNewItemByPosAndDCost(best_conf, item, best_dt);
       _this.samplesSaved++;
       if (newItem && best_dist < targetDistance) {
