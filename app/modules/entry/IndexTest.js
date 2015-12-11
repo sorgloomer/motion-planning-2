@@ -8,33 +8,39 @@ import { default_dict } from '/utils/dicts';
 function randomDotInNBox(nbox) {
   var vec = VecN.copy(nbox.min);
   for (var i = 0; i < vec.length; i++) {
-    vec[i] = nbox.min[i] + Math.random() * (nbox.min[i] - nbox.max[i]);
+    vec[i] = nbox.min[i] + Math.random() * (nbox.max[i] - nbox.min[i]);
   }
   return vec;
 }
 
 function test_nbox() {
-  var bounds = NBox.make([-1, -1, -1],[1, 1, 1]);
+  var bounds = NBox.make([-1, -1, -1, -1],[1, 1, 1, 1]);
   var nboxtree = new NBoxTree(bounds);
 
-  var target = VecN.create(3);
-  for (var i = 0; i < 100000; i++) {
 
+  var target = VecN.create(4);
+  var bestdist = 2000;
+  for (var i = 0; i < 2000; i++) {
     var newvec = randomDotInNBox(bounds);
     nboxtree.putDot(newvec);
 
     var nearest = nboxtree.nearest(target);
     var dist = VecN.dist(nearest, target);
-    console.log(dist);
 
-
+    if (dist > bestdist) {
+      return false;
+    }
   }
 
-
-
+  return true;
 }
 
 function main() {
+  for (var i = 1; i < 11;  i++) {
+    var res = test_nbox();
+    console.log('test_nbox #' + i + ': '
+      + (res ? 'SUCC' : 'FAIL'));
+  }
 
 }
 
