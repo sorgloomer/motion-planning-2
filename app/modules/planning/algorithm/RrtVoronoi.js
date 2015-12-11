@@ -1,3 +1,4 @@
+import Config from '/entry/Config';
 import VecN from '/math/VecN';
 import NBox from '/math/NBox';
 import NBoxTree from '/math/NBoxTree';
@@ -82,7 +83,8 @@ export default class RrtVoronoi {
     var input_saved = this.TEMP_INPUT;
     var input_current = this.TEMP_INPUT2;
 
-    if (Math.random() < this.greediness) {
+    var isGreedyIteration = Math.random() < this.greediness;
+    if (isGreedyIteration) {
       Configuration.copyTo(config_random_target, myMap.target);
     } else {
       Configuration.randomize(config_random_target, myMap.sampleBounds);
@@ -101,6 +103,10 @@ export default class RrtVoronoi {
     ConfigurationInput.applyTo(config_saved, nearest, input_saved);
     saved_dist = Configuration.dist(config_saved, config_random_target);
     saved_cost = ConfigurationInput.costOf(input_saved);
+
+    if (Config.DEBUG_GREEDY && isGreedyIteration) {
+      console.log('greedy: ' + saved_dist);
+    }
 
     for (i = 0; i < this.NEARING_TRIALS; i++) {
       ConfigurationInput.randomize(input_current);

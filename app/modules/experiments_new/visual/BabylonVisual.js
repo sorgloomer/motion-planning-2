@@ -3,6 +3,7 @@ import BABYLON from '/shim/babylon';
 import { DEG_TO_RAD, PI } from '/utils/math';
 import MeshHelper from '/graphics/MeshHelper';
 import Sim3 from '/math/Sim3';
+import DataContainer from '/view/DataContainer';
 
 class ExperimentScene {
   constructor(scene, mat_agent, mesh_world, mesh_agent, mat_wireframe) {
@@ -122,7 +123,7 @@ function createScene(canvas, engine, model, experiment) {
   return new ExperimentScene(scene, mat_agent, mesh_world, mesh_agent, mat_wireframe);
 }
 export default class BabylonVisual {
-  constructor(canvas, experiment) {
+  constructor(canvas, experiment, viewmodel) {
     this.canvas = canvas;
     this.experiment = experiment;
     this.scene = null;
@@ -130,6 +131,8 @@ export default class BabylonVisual {
     this.startTime = 0;
     this.temp_sim = Sim3.create();
     this.solution_loop_time = 7500;
+    this.viewmodel = viewmodel;
+    viewmodel.onData = DataContainer.appendDataToTable;
   }
 
   init(timestamp) {
@@ -163,11 +166,12 @@ export default class BabylonVisual {
     }
   }
   _do_render(model, time) {
+    DataContainer.setCurrentData(model.shown_measurement);
     this.scene.scene.render();
   }
-  render(model, timestamp) {
+  render(timestamp) {
     const time = timestamp - this.startTime;
-    this._preprocess_render(model, time);
-    this._do_render(model, time);
+    this._preprocess_render(this.viewmodel, time);
+    this._do_render(this.viewmodel, time);
   }
 }

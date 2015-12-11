@@ -19,6 +19,10 @@ export default class Sampler3D {
     return this.collider.collide(this.worldTree, this.agentTree, this.sim);
   }
 
+  restart() {
+    this.sampleCount = 0;
+  }
+
   getSampleCount() {
     return this.sampleCount;
   }

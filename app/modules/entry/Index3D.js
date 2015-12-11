@@ -27,13 +27,13 @@ function main() {
     const experiment = new Experiment();
     const solver = new Algorithm(experiment);
 
-    const visual = new BabylonVisual(canvas, experiment);
-    const model = new VisualModel(experiment, solver);
+    const model = new VisualModel(experiment, solver, !!params.get('measure'));
+    const visual = new BabylonVisual(canvas, experiment, model);
 
     visual.init(Date.now());
     visual.run(() => {
       model.update();
-      visual.render(model, Date.now());
+      visual.render(Date.now());
     });
   });
 }

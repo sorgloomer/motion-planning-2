@@ -43,12 +43,18 @@ function main() {
 
   var measurer = null;
   var current_measure = null;
+  var shown_measurement = {
+    time: 0,
+    samples: 0,
+    storage: 0
+  };
+
 
   var measure_restart = !!params.get('measure');
 
   function measureSample() {
     return {
-      samples: experiment.sampler.samplesTook,
+      samples: experiment.sampler.getSampleCount(),
       storage: solver.samples.length,
       cost: solution ? solution.cost : 0
     };
@@ -122,12 +128,6 @@ function main() {
       restartLater();
     }
   }
-
-  var shown_measurement = {
-    time: 0,
-    samples: 0,
-    storage: 0
-  };
 
   function update_measure_viewmodel() {
     current_measure.inspectTo(shown_measurement);
