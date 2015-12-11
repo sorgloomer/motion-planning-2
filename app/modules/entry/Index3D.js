@@ -25,9 +25,8 @@ function main() {
     const Experiment = EXPERIMENTS.get(params.get('exp'));
     const Algorithm = ALGORITHMS.get(params.get('alg'));
     const experiment = new Experiment();
-    const solver = new Algorithm(experiment);
 
-    const model = new VisualModel(experiment, solver, !!params.get('measure'));
+    const model = new VisualModel(experiment, Algorithm, !!params.get('measure'));
     const visual = new BabylonVisual(canvas, experiment, model);
 
     visual.init(Date.now());

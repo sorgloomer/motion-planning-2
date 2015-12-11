@@ -40,8 +40,16 @@ export class Node {
     this.dots = null;
     return ch;
   }
+
+  check() {
+    return arrAll(this.dots, d => this.sampleBounds.contains(d))
+      && arrAll(this.ch, c => c.check());
+  }
 };
 
+function arrAll(arr, fn) {
+  return !arr || !arr.some(x => !fn(x));
+}
 
 export default class NBoxTree {
   constructor(nbox) {
@@ -200,5 +208,9 @@ export default class NBoxTree {
     var success = this.root.putDot(dot, 0, this.maxcnt);
     if (success) this.count++;
     return success;
+  }
+
+  check() {
+    return this.root.check();
   }
 };

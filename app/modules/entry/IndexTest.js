@@ -31,8 +31,7 @@ function test_nbox() {
       return false;
     }
   }
-
-  return true;
+  return nboxtree.check();
 }
 
 function main() {

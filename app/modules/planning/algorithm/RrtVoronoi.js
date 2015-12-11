@@ -98,15 +98,17 @@ export default class RrtVoronoi {
 
     var goodSample = false;
 
+    if (Config.DEBUG_GREEDY && isGreedyIteration) {
+      Configuration.copyTo(config_saved, nearest);
+      var prev_best_dist = Configuration.dist(config_saved, config_random_target);
+      console.log('greedy: ' + prev_best_dist + ' ' + this.boxTree.check());
+    }
+
 
     ConfigurationInput.randomize(input_saved);
     ConfigurationInput.applyTo(config_saved, nearest, input_saved);
     saved_dist = Configuration.dist(config_saved, config_random_target);
     saved_cost = ConfigurationInput.costOf(input_saved);
-
-    if (Config.DEBUG_GREEDY && isGreedyIteration) {
-      console.log('greedy: ' + saved_dist);
-    }
 
     for (i = 0; i < this.NEARING_TRIALS; i++) {
       ConfigurationInput.randomize(input_current);
@@ -116,13 +118,9 @@ export default class RrtVoronoi {
         saved_cost = ConfigurationInput.costOf(input_current);
         saved_dist = current_dist;
 
-        temp = config_saved;
-        config_saved = config_current;
-        config_current = temp;
 
-        temp = input_saved;
-        input_saved = input_current;
-        input_current = temp;
+        VecN.copyTo(config_saved, config_current);
+        VecN.copyTo(input_saved, input_current);
       }
     }
 

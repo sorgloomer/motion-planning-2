@@ -30,7 +30,7 @@ function randomize(c = create()) {
 }
 
 
-function applyTo(dest, config, action, dt = 0.5) {
+function applyTo(dest, config, action, dt = 0.1) {
   dest[0] = config[0] + action[0] * dt * 3;
   dest[1] = config[1] + action[1] * dt * 3;
   dest[2] = config[2] + action[2] * dt * 3;

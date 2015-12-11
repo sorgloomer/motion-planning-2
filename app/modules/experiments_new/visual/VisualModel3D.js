@@ -17,9 +17,10 @@ function _solutionLerpTo(toSim, experiment, tempConf, solution, time) {
 }
 
 export default class VisualModel3D {
-  constructor(experiment, solver, measuring) {
+  constructor(experiment, Algorithm, measuring) {
     this.experiment = experiment;
-    this.solver = solver;
+    this.Algorithm = Algorithm;
+    this.solver = new this.Algorithm(this.experiment);
     this.agent_transform = Sim3.create();
     this.temp_sim = Sim3.create();
     this.temp_configuration = this.experiment.Configuration.create();
@@ -50,8 +51,9 @@ export default class VisualModel3D {
     this.solution_length = 0;
     this.solution_keyframes = null;
     this.has_solution = false;
-    this.current_measure = this.measurer.start();
+    this.solver = new this.Algorithm(this.experiment);
     this.experiment.sampler.restart();
+    this.current_measure = this.measurer.start();
   }
 
   _measure() {
