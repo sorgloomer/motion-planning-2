@@ -25,7 +25,7 @@ export default function DroneRingMapPhysics() {
   this.storeResolutionGradient = 0.2;
   this.checkResolution = 0.02;
 
-  this.connectDistance = 0.1;
+  this.connectDistance = 1.5;
   this.targetDistance = 0.20;
   this.sampleBounds = NBox.make([
     -7, -5, -10,

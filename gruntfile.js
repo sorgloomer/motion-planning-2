@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         clean: {
-            temp: ['.tmp']
+            temp: ['.tmp', 'dist']
         },
         babel: {
             modules: {
@@ -36,35 +36,62 @@ module.exports = function(grunt) {
             }
         },
         copy: {
-            dist: {
+            devel: {
                 files: [
                     { dest: '.tmp/dist/modules.js', src: '.tmp/concat/modules/modules.js' }
+                ]
+            },
+            dist: {
+                files: [
+                    { dest: 'dist/modules.js', src: '.tmp/concat/modules/modules.js' },
+                    { expand: true, dest: 'dist/', cwd: 'app/', src: '*', filter: 'isFile' },
+                    { expand: true, dest: 'dist/', cwd: 'app/', src: 'tex/**/*', filter: 'isFile' },
+                    { expand: true, dest: 'dist/', cwd: 'app/', src: 'lib/**/*', filter: 'isFile' },
+                    { expand: true, dest: 'dist/', cwd: 'app/', src: 'js/**/*', filter: 'isFile' },
+                    { expand: true, dest: 'dist/', cwd: 'app/', src: 'bootstrap/**/*', filter: 'isFile' }
                 ]
             }
         },
         express: {
-            dist: {
+            devel: {
                 options: {
                     port: 8000,
                     bases: ['.tmp/dist/', 'app/']
                 }
+            },
+            dist: {
+                options: {
+                    port: 8000,
+                    bases: ['dist/']
+                }
             }
         },
         watch: {
-            scripts: {
+            scripts_devel: {
                 options: {
                     spawn: false
                 },
                 files: ['app/**/*.js'],
-                tasks: ['build']
+                tasks: ['build:devel']
+            },
+            scripts_dist: {
+                options: {
+                    spawn: false
+                },
+                files: ['app/**/*.js'],
+                tasks: ['build:dist']
             }
         }
     });
 
 
-    grunt.registerTask('build', ['clean:temp', 'babel:modules', 'concat:modules', 'copy:dist']);
-    grunt.registerTask('serve:dist', ['express:dist', 'watch']);
+    grunt.registerTask('dist', ['clean:temp', 'babel:modules', 'concat:modules', 'copy:dist']);
+    grunt.registerTask('build:common', ['clean:temp', 'babel:modules', 'concat:modules']);
+    grunt.registerTask('build:dist', ['build:common', 'copy:dist']);
+    grunt.registerTask('build:devel', ['build:common', 'copy:devel']);
+    grunt.registerTask('serve:dist', ['express:dist', 'watch:scripts_dist']);
+    grunt.registerTask('serve:devel', ['express:devel', 'watch:scripts_devel']);
     grunt.registerTask('serve', ['serve:dist']);
 
-    grunt.registerTask('default', ['build', 'serve']);
+    grunt.registerTask('default', ['build:dist', 'serve:dist']);
 };

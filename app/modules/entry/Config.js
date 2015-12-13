@@ -4,7 +4,7 @@ const DEBUG = false;
 const RELEASE = true;
 
 export default {
-  MEASURE_SOLVING_TIMEOUT: 60,
+  MEASURE_SOLVING_TIMEOUT: 120,
 
   DEBUG_GREEDY: true,
 
